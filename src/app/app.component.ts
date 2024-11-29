@@ -1,13 +1,26 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { AfterViewInit, Component, NgModule } from '@angular/core';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
+import { RouterModule, RouterOutlet } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { routes } from './app.routes';
+import { AuthDataService } from './shared/auth-data.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
+
+  imports: [ReactiveFormsModule, RouterOutlet, DatePipe],
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent{
   title = 'lab-attendance-webapp';
 }
+
+// Bootstrap the application using the routes
+import { bootstrapApplication } from '@angular/platform-browser';
+
+bootstrapApplication(AppComponent, {
+    providers: [provideRouter(routes)],
+});

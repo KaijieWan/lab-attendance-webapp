@@ -1,0 +1,41 @@
+<div class="navbar">
+    <div class="navbar-brand">
+        <img src="assets/ntu_logo.png" alt="NTU Logo" style="width:280px;height:128px;" /> 
+        <h1> 
+            NTU Student Lab Attendance Portal
+        </h1>
+    </div>
+    <div class="navbar-links">  
+        <p style="margin-top:-30%" >
+            Academic Year: 
+            <span name="academicYear">{{ getCurrentAcadYear() }}</span>
+        </p>
+        <p style="margin-top:-4%">
+            Date:
+            <span name="currentDate">{{ date | date: 'dd/MM/yyyy, h:mm a'}}</span>
+        </p>
+        <!-- Add other relevant information -->
+    </div>
+  </div>
+  <div class="input-container">
+    <form [formGroup]="profileForm" class="form">
+      <p>
+      <label for="email">
+        Email:
+        <input type="email" formControlName="email" name="email" />
+      </label>
+      <label for="password">
+        Password:
+        <input type="password" formControlName="password" name="password" />
+      </label>
+        <span class="button-container">
+          <div class="item">
+            <button type="button" (click)="navigateToDashboard()" class="collapsible" [disabled]="!profileForm.valid">Log In</button>
+          </div>
+          <div class="item">
+            <button type="button" (click)="navigateToSignupPage()" class="collapsible">Create Account</button>
+          </div>
+        </span>
+      </p>
+    </form>
+  </div>
