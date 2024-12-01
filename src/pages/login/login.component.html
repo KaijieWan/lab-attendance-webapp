@@ -20,9 +20,9 @@
   <div class="input-container">
     <form [formGroup]="profileForm" class="form">
       <p>
-      <label for="email">
-        Email:
-        <input type="email" formControlName="email" name="email" />
+      <label for="username">
+        Username:
+        <input type="username" formControlName="username" name="username" />
       </label>
       <label for="password">
         Password:
@@ -30,7 +30,7 @@
       </label>
         <span class="button-container">
           <div class="item">
-            <button type="button" (click)="navigateToDashboard()" class="collapsible" [disabled]="!profileForm.valid">Log In</button>
+            <button type="button" (click)="login()" class="collapsible" [disabled]="!profileForm.valid">Log In</button>
           </div>
           <div class="item">
             <button type="button" (click)="navigateToSignupPage()" class="collapsible">Create Account</button>

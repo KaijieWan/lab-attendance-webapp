@@ -9,6 +9,7 @@
 }
 
 body {
+    width: 100%;
     min-height: 100vh;
     background: #d2d2d2;
 }
@@ -150,12 +151,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .navbar-brand {
     font-size: 12px;
     width: 50%;
-    margin: auto;
+    margin: 0 auto;
 }
 
 .navbar-brand img{

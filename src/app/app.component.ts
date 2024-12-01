@@ -4,7 +4,6 @@ import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { Router, provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { AuthDataService } from './shared/auth-data.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +19,10 @@ export class AppComponent{
 
 // Bootstrap the application using the routes
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideHttpClient } from '@angular/common/http';
 
 bootstrapApplication(AppComponent, {
-    providers: [provideRouter(routes)],
+    providers: [provideRouter(routes),
+      provideHttpClient(),
+    ],
 });

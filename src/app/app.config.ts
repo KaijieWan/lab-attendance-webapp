@@ -1,12 +1,12 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { CanActivateFn, provideRouter } from '@angular/router';
 import { GoogleLoginProvider, SocialLoginModule, SocialAuthServiceConfig} from '@abacritt/angularx-social-login';
 import { MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalService, MsalGuard, MsalBroadcastService, MsalInterceptor, MsalGuardConfiguration, MsalInterceptorConfiguration } from '@azure/msal-angular';
 import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 
 /*
 // Define MSAL instance
@@ -57,26 +57,15 @@ export const appConfig: ApplicationConfig = {
     }
   ]*/
 
+    export const authGuard: CanActivateFn = () => {
+      const token = localStorage.getItem('authToken');
+      return !!token; // Allow access if token exists
+    };
+
     export const appConfig: ApplicationConfig = {
       providers: [
         provideRouter(routes),
         provideZoneChangeDetection({ eventCoalescing: true }),
-        {
-          provide: 'SocialAuthServiceConfig',
-          useValue: {
-            autoLogin: false,
-            providers: [
-              {
-                id: GoogleLoginProvider.PROVIDER_ID,
-                provider: new GoogleLoginProvider(environment.GOOGLE_KEY, {
-                  oneTapEnabled: true,
-                }),
-              },
-            ],
-            onError: (err) => {
-              console.error(err);
-            },
-          } as SocialAuthServiceConfig,
-        },
+        provideHttpClient(),
       ],
-    };
+    };    
