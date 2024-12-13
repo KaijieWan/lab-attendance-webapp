@@ -1,0 +1,115 @@
+<div class="navbar">
+    <div class="navbar-brand">
+        <img src="assets/ntu_logo.png" alt="NTU Logo" style="width:280px;height:128px;" /> 
+        <h1> 
+            NTU Student Lab Attendance Portal
+        </h1>
+    </div>
+    <div class="navbar-links">  
+        <p style="margin-top:-30%" >
+            Academic Year: 
+            <span name="academicYear">{{ getCurrentAcadYear() }}</span>
+        </p>
+        <p style="margin-top:-4%">
+            Date:
+            <span name="currentDate">{{ date | date: 'dd/MM/yyyy, h:mm a'}}</span>
+        </p>
+        <!-- Add other relevant information -->
+    </div>
+</div>
+
+<!-- <div class="input-container">
+    <form [formGroup]="profileForm" class="form">
+        <p>
+            <span class="forgetPass_title">
+                <u>Reset Password</u>
+            </span>
+            <label for="newPass">
+              Enter new password:
+              <input
+              id="newPass"
+              type="password"
+              formControlName="newPass"
+              (input)="checkPasswordStrength(profileForm.get('newPass')!.value)"/>
+            </label>
+            
+            <span>Password Strength: {{ passwordStrength }}</span>
+
+            <label for="confirmPass">
+                Confirm new password:
+                <input type="email" formControlName="confirmPass" name="confirmPass" />
+              </label>
+            <span>
+                <div class="item">
+                  <button type="button" class="collapsible" [disabled]="sending">
+                    <span *ngIf="!sending">Reset Password</span>
+                    <span *ngIf="sending">
+                      Sending...</span>
+                  </button>
+                </div>
+            </span>
+        </p>
+    </form>
+</div> -->
+
+<div class="input-container">
+    <span class="forgetPass_title">
+        <u>Reset Password</u>
+    </span>
+    <form [formGroup]="profileForm" class="form">
+        <div>
+          <label for="newPass">
+            New Password:
+            <input
+            id="newPass"
+            type="password"
+            formControlName="newPass"
+            (input)="checkPasswordStrength(profileForm.get('newPass')?.value ?? '')"/>
+        </label>
+          
+          <!-- Password Strength -->
+          <label>Password Strength: {{ passwordStrength }}</label>
+      
+          <!-- Synchronous Validation Errors -->
+          <div *ngIf="profileForm.get('newPass')?.errors">
+            <p *ngIf="profileForm.get('newPass')?.hasError('required')" class="error-message">
+              Password is required.
+            </p>
+            <p *ngIf="profileForm.get('newPass')?.hasError('minlength')" class="error-message">
+              Password must be at least 8 characters.
+            </p>
+          </div>
+      
+          <!-- Async Validation Errors -->
+          <div *ngIf="profileForm.get('newPass')?.pending">Checking password...</div>
+          <div *ngIf="profileForm.get('newPass')?.errors?.['needsUppercase']" class="error-message">
+            Password must include at least one uppercase letter.
+          </div>
+          <div *ngIf="profileForm.get('newPass')?.errors?.['needsNumber']" class="error-message">
+            Password must include at least one number.
+          </div>
+
+          <label for="confirmPass">
+            Confirm Password:
+            <input id="confirmPass" type="password" formControlName="confirmPass" />
+          </label>
+          
+          <div *ngIf="profileForm.hasError('mismatch') && profileForm.touched" class="error-message">
+            Passwords do not match.
+          </div>
+
+          <span>
+            <div class="item">
+              <button type="button" (click)="resetPassword()" class="collapsible" [disabled]="sending" [disabled]="profileForm.invalid">
+                <span *ngIf="!sending">Reset Password</span>
+                <span *ngIf="sending">
+                  Resetting...</span>
+              </button>
+            </div>
+        </span>
+        </div>
+      
+        <!-- <button type="submit" [disabled]="profileForm.invalid">Reset Password</button>-->
+      </form>
+
+</div>

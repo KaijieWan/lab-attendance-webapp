@@ -9,8 +9,44 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <link rel="stylesheet" href="profile.component.scss">
     </head>
-    <body>
-        <h1>Profile Section</h1>
-        <p>Content for Profile goes here.</p>
-    </body>
+        <body>
+            <div>
+                <h2 style="text-align: center; margin-bottom: -10px;">Profile</h2>
+                <h3 style="color: red;">*Change only the details intended and leave the others untouched</h3>
+                <div class="popup-box">
+                    <form [formGroup]="profileForm" class="form">
+                        <label for="name">
+                            Name:
+                            <input type="name" [(ngModel)]="name" formControlName="name" name="name" />
+                        </label>
+                        <label for="email">
+                            Email:
+                            <input type="email" [(ngModel)]="email" formControlName="email" name="email" />
+                        </label>
+                        <label for="oldPassword">
+                            Old Password:
+                            <input type="password" formControlName="oldPassword" name="oldPassword" />
+                        </label>
+                        <label for="newPassword">
+                            New Password:
+                            <input type="password" formControlName="newPassword" name="newPassword" />
+                        </label>
+                        <label for="confirmPassword">
+                            Confirm New Password:
+                            <input type="password" formControlName="confirmPassword" name="confirmPassword" />
+                        </label>
+
+                        <span>
+                            <div class="item">
+                              <button type="button" (click)="saveDetails()" class="collapsible" [disabled]="saving" [disabled]="profileForm.invalid">
+                                <span *ngIf="!saving">Save Details</span>
+                                <span *ngIf="saving">
+                                  Saving...</span>
+                              </button>
+                            </div>
+                        </span>
+                    </form>
+                </div>
+            </div>
+        </body>
 </html>

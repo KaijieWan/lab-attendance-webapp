@@ -11,13 +11,20 @@ import { AbsencesComponent } from '../pages/absences/absences.component';
 import { ProfileComponent } from '../pages/profile/profile.component';
 import { AccManagementComponent } from '../pages/accManagement/accManagement.component';
 import { SettingsComponent } from '../pages/settings/settings.component';
+import { ForgetPassComponent } from '../pages/login/forgetPass.component';
+import { ResetPassComponent } from '../pages/login/resetPass.component';
+import { ErrorComponent } from '../pages/error/error.component';
+import { AuthGuard } from './auth.guard';
 
 export const routes: Routes = [
     //{ path: '', component: LoginComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
+    { path: 'forgetPass', component: ForgetPassComponent },
+    { path: 'resetPass', component: ResetPassComponent },
+    { path: 'error', component: ErrorComponent },
     { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: 'drawer', component: DrawerComponent,
+    { path: 'drawer', component: DrawerComponent, canActivate: [AuthGuard],
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'courses', component: CoursesComponent },

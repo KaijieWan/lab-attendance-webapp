@@ -11,7 +11,7 @@
 body {
     width: 100%;
     min-height: 100vh;
-    background: #d2d2d2;
+    background: white;
 }
 
 .sidebar {
@@ -173,14 +173,18 @@ body {
 .navbar-links {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     margin-left: -18%;
     font-size: 16px;
 }
 
 .menu-content {
-    display: flex;
+    //display: flex;
     align-items: center;
     gap: 10px;
 }
 
+.logout {
+    cursor: pointer;
+}
 

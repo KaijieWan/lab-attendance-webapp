@@ -16,7 +16,7 @@
         </p>
         <!-- Add other relevant information -->
     </div>
-  </div>
+</div>
   <div class="input-container">
     <form [formGroup]="profileForm" class="form">
       <p>
@@ -28,14 +28,26 @@
         Password:
         <input type="password" formControlName="password" name="password" />
       </label>
-        <span class="button-container">
-          <div class="item">
-            <button type="button" (click)="login()" class="collapsible" [disabled]="!profileForm.valid">Log In</button>
-          </div>
-          <div class="item">
-            <button type="button" (click)="navigateToSignupPage()" class="collapsible">Create Account</button>
-          </div>
-        </span>
+      <span>
+        <div class="item">
+          <!-- <span *ngIf="loading"><img src="assets/spinner.gif" /></span> -->
+          <button type="button" (click)="login()" class="collapsible" [disabled]="loading">
+            <span *ngIf="!loading">Log In</span>
+            <span *ngIf="loading">
+              Logging in...</span>
+          </button>
+        </div>
+      </span>
+      <span *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </span> 
+      <span>
+        <p (click)="forgetPass()" class="forgot_pass">
+          <u>Forget Password</u>
+        </p>
+      </span>
       </p>
     </form>
   </div>
+
+  <!--[disabled]="!profileForm.valid"-->

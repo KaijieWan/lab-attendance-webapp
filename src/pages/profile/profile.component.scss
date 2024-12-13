@@ -1,3 +1,70 @@
 body {
-    margin-left: 30%;
+    margin: 0;
+    //height: 100vh; /* Ensure the body spans the full height of the viewport */
+    display: flex; /* Use Flexbox to align items */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
+}
+
+.popup-box {
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    border: 1.4px solid black;
+    border-radius: 0.5rem; /* rounded corners */
+    display: flex; /* Flexbox for child elements */
+    flex-direction: column; /* Stack children vertically */
+    box-shadow: 0px 5px 5px #888888; 
+}
+
+form {
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    padding: 8px;
+    font-size: 16px;
+    text-align: right;
+}
+
+.item {
+    display: flex;
+    flex-direction: row;
+}
+
+.collapsible {
+    white-space: nowrap; /* Prevent text from wrapping */
+    padding: 10px 20px; /* Adjusts button size for better appearance */
+    text-align: match-parent; /* Centers text horizontally */
+}
+
+button.absent,
+button.present,
+button.leave {
+    background-color: black;
+}
+
+button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+    align-self: center;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    transform: translateX(-50%); /* Keeps the center fixed */
+    left: 50%; /* Adjust to center */
+    transition: all 0.3s ease-in-out; /* Smooth resizing effect */
+}
+
+button:hover {
+    background-color: #2980b9;
 }

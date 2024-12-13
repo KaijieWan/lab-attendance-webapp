@@ -73,7 +73,7 @@
                         </span>Settings</a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a (click)="logout()" class="logout">
                         <span class="material-symbols-outlined">
                         logout
                         </span>Logout</a>
@@ -89,7 +89,7 @@
                 </h1>
             </div>
             <div class="navbar-links">  
-                <p style="margin-top:-30%" >
+                <p style="margin-top:0" >
                     Academic Year: 
                     <span name="academicYear">{{ getCurrentAcadYear() }}</span>
                 </p>
@@ -97,6 +97,12 @@
                     Date:
                     <span name="currentDate">{{ date | date: 'dd/MM/yyyy, h:mm a'}}</span>
                 </p>
+                <span *ngIf="username" style="text-align: end; margin-right: 4%; color: bisque; margin-top: 30%;">
+                    Username: {{ username }}
+                </span>
+                <span *ngIf="name" style="text-align: end; margin-right: 4%; color: bisque;">
+                    Name: {{ name }}
+                </span>
                 <!-- Add other relevant information -->
             </div>
         </div>

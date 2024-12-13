@@ -1,5 +1,4 @@
-import { SocialAuthService } from '@abacritt/angularx-social-login';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, ValidationErrors} from '@angular/forms';
 import { RouterModule, RouterOutlet } from '@angular/router';
@@ -13,7 +12,7 @@ import { provideHttpClient } from '@angular/common/http';
   standalone: true,
   templateUrl: './login.component.html',
 
-  imports: [ReactiveFormsModule, RouterOutlet, DatePipe],
+  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, CommonModule],
   styleUrls: ['./login.component.scss']
 })
 
@@ -21,6 +20,7 @@ export class LoginComponent{
   date = new Date();
   title = 'lab-attendance-login';
   errorMessage: string = '';
+  loading = false;
   constructor(private router: Router, private userService : UserService) {}
 
   profileForm = new FormGroup({
@@ -29,44 +29,69 @@ export class LoginComponent{
   });
 
   login() {
-    if (!this.profileForm.value.username || !this.profileForm.value.password) {
+    console.log('Form Status:', this.profileForm.status); // Should be INVALID if any field is empty
+    console.log('Form Errors:', this.profileForm.errors); // Log validation errors
+    console.log('Controls:', this.profileForm.controls);
+
+    const usernameControl = this.profileForm.get('username');
+    const passwordControl = this.profileForm.get('password');
+
+    console.log('Username Value:', usernameControl?.value);
+    console.log('Username Errors:', usernameControl?.errors);
+    console.log('Password Value:', passwordControl?.value);
+
+    // Check for required fields and validation errors
+    if (!usernameControl?.value || !passwordControl?.value) {
       this.errorMessage = 'Username and password are required.';
       return;
     }
+
+    if (usernameControl.invalid) {
+      this.errorMessage = 'Username must be alphanumeric and 4-20 characters long.';
+      console.log('Error Message:', this.errorMessage);
+      return;
+    }
+
+    if (passwordControl.invalid) {
+      this.errorMessage = 'Password is required.';
+      console.log('Error Message:', this.errorMessage);
+      return;
+    }
+  
     console.log('Attempting login with:', this.profileForm.value);
 
-    this.userService.login({ username: this.profileForm.value.username, password: this.profileForm.value.password }).subscribe({
+    this.loading = true;
+    this.userService.login({ username: usernameControl.value, password: passwordControl.value }).subscribe({
       next: (response) => {
         console.log('Login successful:', response);
-        // Handle token storage
+        // Handle token and user id storage
         localStorage.setItem('authToken', response.token);
+        sessionStorage.setItem('authToken', response.token);
+        localStorage.setItem('id', response.user.id.toString());
+        sessionStorage.setItem('id', response.user.id.toString());
         this.router.navigate(['/drawer']); // Redirect after login
       },
       error: (err) => {
         console.error('Login failed:', err);
+        this.loading = false;
         this.errorMessage = err.error.message || 'Login failed. Please try again.';
+      },
+      complete: () => {
+        this.loading = false;
       },
     });
   }
-  
-  logout() {
-    this.userService.logout();
-    this.router.navigate(['/login']);
-  }
 
-  /*navigateToDashboard(){
-    if (this.profileForm.valid) {
-      // Perform form submission actions login
-      alert(this.profileForm.value.email);
-      this.router.navigate(['/drawer']);
-    } else {
-      // Handle validation errors
-      alert('Form is invalid');
-    }
-  }*/
+  forgetPass(){
+    this.router.navigate(['/forgetPass'])
+  }
 
   navigateToSignupPage(){
     this.router.navigate(['/signup'])
+  }
+
+  toResetPass(){
+    this.router.navigate(['/resetPass']);
   }
 
   getCurrentAcadYear(){
@@ -86,7 +111,7 @@ export class LoginComponent{
 
 export function usernameValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const usernameRegex = /^[a-zA-Z0-9]{4,20}$/; // Alphanumeric, 4-20 characters
+    const usernameRegex = /^[a-zA-Z0-9]{3,20}$/; // Matches alphabets and alphanumeric usernames (4-20 chars)
     const valid = usernameRegex.test(control.value);
     return valid ? null : { invalidUsername: true };
   };
