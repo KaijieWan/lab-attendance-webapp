@@ -15,6 +15,8 @@ import { ForgetPassComponent } from '../pages/login/forgetPass.component';
 import { ResetPassComponent } from '../pages/login/resetPass.component';
 import { ErrorComponent } from '../pages/error/error.component';
 import { AuthGuard } from './auth.guard';
+import { PermissionGuard } from './permission.guard';
+import { AccessDeniedComponent } from '../pages/error/accessDenied.component';
 
 export const routes: Routes = [
     //{ path: '', component: LoginComponent },
@@ -32,10 +34,12 @@ export const routes: Routes = [
             { path: 'labSchedules', component: LabSchedulesComponent },
             { path: 'absences', component: AbsencesComponent },
             { path: 'profile', component: ProfileComponent },
-            { path: 'accManagement', component: AccManagementComponent },
+            { path: 'accManagement', component: AccManagementComponent,
+                canActivate: [PermissionGuard], data: {permissionType: 'accounts_management_page'} },
             { path: 'settings', component: SettingsComponent },
             //{ path: 'dashboard', component: DashboardComponent },
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: 'access-denied', component: AccessDeniedComponent }
         ]
      }
 ];

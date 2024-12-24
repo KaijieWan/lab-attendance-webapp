@@ -68,3 +68,23 @@ button {
 button:hover {
     background-color: #2980b9;
 }
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+    align-items: center;
+    display: block;
+    justify-content: center;
+}
+
+.success-message {
+    color: green;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+    align-items: center;
+    display: block;
+    justify-content: center;
+}

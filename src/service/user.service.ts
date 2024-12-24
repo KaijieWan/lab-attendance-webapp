@@ -23,7 +23,7 @@ export interface ResetPassRequest {
   token: string;
 }
 
-export interface ResetPassResponse {
+export interface MessageResponse {
   message: string;
   status: string;
 }
@@ -34,6 +34,42 @@ export interface UserResponse {
   name: string;
   email: string;
   role: string;
+}
+
+export interface UpdatePassRequest {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface UpdateUserRequest {
+  email: string;
+  name: string;
+  role: string;
+  username: string;
+}
+
+export interface UserDTO {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface PaginatedResponse {
+  content: UserDTO[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number; // Current page
+}
+
+export interface CreateUserRequest{
+  username: string;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
 }
 
 @Injectable({
@@ -53,7 +89,7 @@ export class UserService {
 
   logout(){
     // Clear authentication token from storage
-    console.log("Removal of token: " + localStorage.getItem('authToken'))
+    console.log("Removal of token")
     localStorage.removeItem('authToken'); 
     sessionStorage.removeItem('authToken'); // Remove session if stored here
   }
@@ -104,4 +140,21 @@ export class UserService {
   getUser(id: number): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${this.userUrl}/${id}`);
   }
+
+  getAllUsers(page: number, size: number) : Observable<PaginatedResponse> {
+    return this.http.get<PaginatedResponse>(`${this.userUrl}?page=${page}&size=${size}`);
+  }
+
+  updatePassword(credentials: UpdatePassRequest, id: number) : Observable<MessageResponse> {
+    return this.http.patch<MessageResponse>(`${this.userUrl}/${id}/password`, credentials);
+  }
+
+  updateUser(credentials: UpdateUserRequest, id: number) : Observable<MessageResponse> {
+    return this.http.put<MessageResponse>(`${this.userUrl}/${id}`, credentials);
+  }
+
+  createUser(credentials: CreateUserRequest) : Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${this.userUrl}/create`, credentials);
+  }
+
 };

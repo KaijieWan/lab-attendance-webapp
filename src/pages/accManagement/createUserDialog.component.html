@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Responsive Sidebar Menu</title>
+        <!-- Linking Google Font link for icons-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link rel="stylesheet" href="accManagement.component.scss">
+    </head>
+    <body>
+        <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"><b>Create New User</b></h1>
+        <div mat-dialog-content>
+            <form [formGroup]="profileForm" class="form">
+                <label for="name">
+                    Name:
+                    <input type="name" formControlName="name" name="name" />
+                </label>
+                <label for="username">
+                  Username:
+                  <input type="username" formControlName="username" name="username" />
+              </label>
+                <label for="email">
+                    Email:
+                    <input type="email"  formControlName="email" name="email" />
+                </label>
+                <div class="dropdown">
+                  <label for="role">Role:</label>
+                  <select id="role" name="role" [(ngModel)]="selectedRole" formControlName="role">
+                    <option value="" disabled style="background-color: gray">Select available role</option>
+                    <option *ngFor="let item of distinctRoles" [value]="item">{{ item }}</option>
+                  </select>
+                </div>
+
+                <!-- <label for="angularDropdown">Select an item:</label>
+                      <select id="angularDropdown" [(ngModel)]="selectedItem" name="angularDropdown">
+                        <option *ngFor="let item of items" [value]="item">{{ item }}</option>
+                      </select>
+                -->
+        
+                <label for="newPassword">
+                    Password:
+                    <input
+                    id="newPassword"
+                    type="password"
+                    formControlName="newPassword"
+                    name="newPassword"
+                    (input)="checkPasswordStrength(profileForm.get('newPassword')?.value ?? '')"/>
+                </label>
+                  
+                  <!-- Password Strength -->
+                  <label style="text-align: center;">Password Strength: {{ passwordStrength }}</label>
+              
+                  <!-- Synchronous Validation Errors -->
+                  <div *ngIf="profileForm.get('newPassword')?.errors">
+                    <!--<p *ngIf="profileForm.get('newPassword')?.hasError('required')" class="error-message">
+                      Password is required.
+                    </p> -->
+                    <p *ngIf="profileForm.get('newPassword')?.hasError('minlength')" class="error-message">
+                      Password must be at least 8 characters.
+                    </p>
+                  </div>
+              
+                  <!-- Async Validation Errors -->
+                  <div *ngIf="profileForm.get('newPassword')?.pending">Checking password...</div>
+                  <div *ngIf="profileForm.get('newPassword')?.errors?.['needsUppercase']" class="error-message">
+                    Password must include at least one uppercase letter.
+                  </div>
+                  <div *ngIf="profileForm.get('newPassword')?.errors?.['needsNumber']" class="error-message">
+                    Password must include at least one number.
+                  </div>
+        
+                  <label for="confirmPassword">
+                    Confirm Password:
+                    <input id="confirmPassword" type="password" formControlName="confirmPassword" name="confirmPassword"/>
+                  </label>
+                  
+                  <div *ngIf="profileForm.hasError('mismatch') && profileForm.touched" class="error-message">
+                    Passwords do not match.
+                  </div>
+
+                <span *ngIf="errorMessage" class="error-message">
+                  {{ errorMessage }}
+                </span>
+            </form>
+        </div>
+        <div mat-dialog-actions class="item">
+          <button type="button" mat-dialog-close>Cancel</button>
+          <button type="button" (click)="profileForm.valid && submitDetails()" [disabled]="!profileForm.valid">
+            <span *ngIf="!submit">Create User</span>
+            <span *ngIf="submit">
+              Creating...</span>
+          </button>
+        </div>
+    </body>
+</html>

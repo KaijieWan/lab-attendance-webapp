@@ -17,33 +17,76 @@
                     <form [formGroup]="profileForm" class="form">
                         <label for="name">
                             Name:
-                            <input type="name" [(ngModel)]="name" formControlName="name" name="name" />
+                            <input type="name" [value]="original_name" [(ngModel)]="form_name" formControlName="name" name="name" />
                         </label>
                         <label for="email">
                             Email:
-                            <input type="email" [(ngModel)]="email" formControlName="email" name="email" />
+                            <input type="email" [value]="original_email" [(ngModel)]="form_email" formControlName="email" name="email" />
                         </label>
                         <label for="oldPassword">
                             Old Password:
                             <input type="password" formControlName="oldPassword" name="oldPassword" />
                         </label>
+
                         <label for="newPassword">
                             New Password:
-                            <input type="password" formControlName="newPassword" name="newPassword" />
+                            <input
+                            id="newPassword"
+                            type="password"
+                            formControlName="newPassword"
+                            name="newPassword"
+                            (input)="checkPasswordStrength(profileForm.get('newPassword')?.value ?? '')"/>
                         </label>
-                        <label for="confirmPassword">
-                            Confirm New Password:
-                            <input type="password" formControlName="confirmPassword" name="confirmPassword" />
-                        </label>
+                          
+                          <!-- Password Strength -->
+                          <label style="text-align: center;">Password Strength: {{ passwordStrength }}</label>
+                      
+                          <!-- Synchronous Validation Errors -->
+                          <div *ngIf="profileForm.get('newPassword')?.errors">
+                            <!--<p *ngIf="profileForm.get('newPassword')?.hasError('required')" class="error-message">
+                              Password is required.
+                            </p> -->
+                            <p *ngIf="profileForm.get('newPassword')?.hasError('minlength')" class="error-message">
+                              Password must be at least 8 characters.
+                            </p>
+                          </div>
+                      
+                          <!-- Async Validation Errors -->
+                          <div *ngIf="profileForm.get('newPassword')?.pending">Checking password...</div>
+                          <div *ngIf="profileForm.get('newPassword')?.errors?.['needsUppercase']" class="error-message">
+                            Password must include at least one uppercase letter.
+                          </div>
+                          <div *ngIf="profileForm.get('newPassword')?.errors?.['needsNumber']" class="error-message">
+                            Password must include at least one number.
+                          </div>
+                
+                          <label for="confirmPassword">
+                            Confirm Password:
+                            <input id="confirmPassword" type="password" formControlName="confirmPassword" name="confirmPassword"/>
+                          </label>
+                          
+                          <div *ngIf="profileForm.hasError('mismatch') && profileForm.touched" class="error-message">
+                            Passwords do not match.
+                          </div>
 
                         <span>
                             <div class="item">
-                              <button type="button" (click)="saveDetails()" class="collapsible" [disabled]="saving" [disabled]="profileForm.invalid">
+                              <button type="button" (click)="saveDetails()" class="collapsible" [disabled]="saving">
                                 <span *ngIf="!saving">Save Details</span>
                                 <span *ngIf="saving">
                                   Saving...</span>
                               </button>
                             </div>
+                        </span>
+
+                        <span *ngIf="successMessage" class="success-message">
+                          {{ successMessage }}
+                        </span>
+                        <span *ngIf="name_email_error" class="error-message">
+                          {{ name_email_error }}
+                        </span>
+                        <span *ngIf="password_error" class="error-message">
+                          {{ password_error }}
                         </span>
                     </form>
                 </div>

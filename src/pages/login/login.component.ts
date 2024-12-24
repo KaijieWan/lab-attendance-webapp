@@ -38,7 +38,7 @@ export class LoginComponent{
 
     console.log('Username Value:', usernameControl?.value);
     console.log('Username Errors:', usernameControl?.errors);
-    console.log('Password Value:', passwordControl?.value);
+    //console.log('Password Value:', passwordControl?.value);
 
     // Check for required fields and validation errors
     if (!usernameControl?.value || !passwordControl?.value) {
@@ -58,7 +58,7 @@ export class LoginComponent{
       return;
     }
   
-    console.log('Attempting login with:', this.profileForm.value);
+    //console.log('Attempting login with:', this.profileForm.value);
 
     this.loading = true;
     this.userService.login({ username: usernameControl.value, password: passwordControl.value }).subscribe({
@@ -69,6 +69,8 @@ export class LoginComponent{
         sessionStorage.setItem('authToken', response.token);
         localStorage.setItem('id', response.user.id.toString());
         sessionStorage.setItem('id', response.user.id.toString());
+
+        sessionStorage.setItem('userDetails', JSON.stringify(response));
         this.router.navigate(['/drawer']); // Redirect after login
       },
       error: (err) => {

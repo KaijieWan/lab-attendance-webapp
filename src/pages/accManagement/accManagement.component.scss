@@ -1,3 +1,167 @@
 body {
-    margin-left: 30%;
+    margin: 0;
+    //height: 100vh; /* Ensure the body spans the full height of the viewport */
+    display: flex; /* Use Flexbox to align items */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
 }
+
+.popup-box {
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;
+    border: 1.4px solid black;
+    border-radius: 0.5rem; /* rounded corners */
+    display: flex; /* Flexbox for child elements */
+    flex-direction: column; /* Stack children vertically */
+    box-shadow: 0px 5px 5px #888888; 
+}
+
+form {
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    padding: 8px;
+    font-size: 16px;
+    text-align: right;
+}
+
+.item {
+    display: flex;
+    flex-direction: row;
+}
+
+.collapsible {
+    white-space: nowrap; /* Prevent text from wrapping */
+    padding: 10px 20px; /* Adjusts button size for better appearance */
+    text-align: match-parent; /* Centers text horizontally */
+}
+
+button.absent,
+button.present,
+button.leave {
+    background-color: black;
+}
+
+/* button {
+    background-color: #3498db;
+    color: #fff;
+    margin: 0px 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+    align-self: center;
+    text-align: center;
+    display: inline-block;
+    //position: relative;
+    transform: translateX(-50%); 
+    left: 50%;
+    transition: all 0.3s ease-in-out;
+}*/
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+    align-items: center;
+    display: block;
+    justify-content: center;
+}
+
+.success-message {
+    color: green;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+    align-items: center;
+    display: block;
+    justify-content: center;
+}
+
+.user-list {
+    margin: 20px;
+    font-size: 15px;
+}
+  
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+th, td {
+    //border: 0px solid #ddd;
+    padding: 14px 40px;
+    text-align: left;
+    border-bottom: 2px solid #3498db;
+}
+  
+.pagination {
+    display: flex;
+    justify-content: center; /* Center-align the elements horizontally */
+    align-items: center; /* Vertically align items in the center */
+    gap: 10px; /* Add spacing between elements */
+    margin: 20px; /* Add spacing above the pagination controls */
+}
+  
+.pagination button {
+    background-color: #3498db;
+    color: #fff;
+    margin: 0px 5px;
+    border-radius: 20px;
+    border: none;
+    padding: 5px 10px; /* Add padding to buttons for better UX */
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background-color: #2980b9;
+}
+
+.new_settings {
+    display: flex;
+    justify-content: center; /* Center-align the elements horizontally */
+    //align-items: center; /* Vertically align items in the center */
+    margin: 20px; /* Add spacing above the pagination controls */
+    justify-content: space-between;
+    gap: 200px;
+}
+
+.new_settings button{
+    display: inline-flex;
+    background-color: #3498db;
+    color: #fff;
+    margin: 0px 5px;
+    border: none;
+    padding: 10px 12px; 
+    font-size: 14px;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.new_settings button:hover {
+    background-color: #2980b9;
+}
+
+.material-symbols-outlined {
+    font-size: 20px;
+    line-height: 1;
+    margin-top: -2px;
+}
+
+.custom-dialog-container {
+    max-width: 80vw; /* Maximum width of 80% of the viewport width */
+    min-width: 600px; /* Ensure it's not too narrow */
+    max-height: 90vh; /* Optional: Maximum height */
+    padding: 20px; /* Optional: Add padding for inner spacing */
+    border-radius: 20px;
+}
+  
