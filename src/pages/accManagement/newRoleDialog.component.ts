@@ -7,6 +7,8 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { debounceTime, map, Observable, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
+import { ToastrService, ToastrModule } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-newRoleDialog-page',
@@ -53,7 +55,8 @@ export class NewRoleDialogComponent {
         @Inject(MAT_DIALOG_DATA) public data: any,
         private userService: UserService,
         private rolePermissionService: RolePermissionService,
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private toastr: ToastrService,
     ) {
         this.rolePermissionsForm = this.fb.group({});
         this.updateRoleForm = this.fb.group({});
@@ -240,6 +243,7 @@ export class NewRoleDialogComponent {
                 switch(response.status){
                     case "SUCCESS" : {
                         console.log('Creation of new role successful:', response);
+                        this.toastr.success("Created New Role!", "SUCCESS");
                         this.dialogRef.close();
                         break;
                       }
@@ -304,6 +308,7 @@ export class NewRoleDialogComponent {
                 switch(response.status){
                     case "SUCCESS" : {
                         console.log('Updating of role successful:', response);
+                        this.toastr.success("Updated Role!", "SUCCESS");
                         this.dialogRef.close();
                         break;
                       }

@@ -7,6 +7,8 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { debounceTime, map, Observable, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
+import { ToastrService, ToastrModule } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-createUserDialog-page',
@@ -28,7 +30,8 @@ export class CreateUserDialogComponent {
       public dialogRef: MatDialogRef<CreateUserDialogComponent>,
       @Inject(MAT_DIALOG_DATA) public data: any,
       private userService: UserService,
-      private rolePermissionService: RolePermissionService
+      private rolePermissionService: RolePermissionService,
+      private toastr: ToastrService,
   ) {}
 
     ngOnInit(): void {
@@ -116,6 +119,7 @@ export class CreateUserDialogComponent {
             switch(response.status) {
               case "SUCCESS" : {
                 console.log('Creation of new user successful:', response);
+                this.toastr.info("Created New User!", "SUCCESS");
                 this.dialogRef.close();
                 break;
               }

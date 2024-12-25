@@ -29,10 +29,18 @@ export const routes: Routes = [
     { path: 'drawer', component: DrawerComponent, canActivate: [AuthGuard],
         children: [
             { path: 'dashboard', component: DashboardComponent },
-            { path: 'courses', component: CoursesComponent },
-            { path: 'students', component: StudentsComponent },
-            { path: 'labSchedules', component: LabSchedulesComponent },
-            { path: 'absences', component: AbsencesComponent },
+            { path: 'courses', component: CoursesComponent,
+                canActivate: [PermissionGuard], data: {permissionType: 'courses_page'}
+             },
+            { path: 'students', component: StudentsComponent,
+                canActivate: [PermissionGuard], data: {permissionType: 'students_page'}
+             },
+            { path: 'labSchedules', component: LabSchedulesComponent,
+                canActivate: [PermissionGuard], data: {permissionType: 'lab_schedules_page'}
+             },
+            { path: 'absences', component: AbsencesComponent,
+                canActivate: [PermissionGuard], data: {permissionType: 'absences_page'}
+             },
             { path: 'profile', component: ProfileComponent },
             { path: 'accManagement', component: AccManagementComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'accounts_management_page'} },

@@ -7,6 +7,9 @@ import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { provideToastr } from 'ngx-toastr';
 
 /*
 // Define MSAL instance
@@ -67,5 +70,7 @@ export const appConfig: ApplicationConfig = {
         provideRouter(routes),
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideHttpClient(),
+        provideAnimations(),
+        provideToastr(),
       ],
     };    

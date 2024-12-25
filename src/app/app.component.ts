@@ -4,6 +4,9 @@ import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { Router, provideRouter } from '@angular/router';
 import { routes } from './app.routes';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { provideToastr } from 'ngx-toastr';
 
 @Component({
   selector: 'app-root',
@@ -24,5 +27,7 @@ import { provideHttpClient } from '@angular/common/http';
 bootstrapApplication(AppComponent, {
     providers: [provideRouter(routes),
       provideHttpClient(),
+      provideAnimations(),
+      provideToastr(),
     ],
 });
