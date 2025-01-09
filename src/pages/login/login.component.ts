@@ -31,7 +31,7 @@ export class LoginComponent{
   login() {
     console.log('Form Status:', this.profileForm.status); // Should be INVALID if any field is empty
     console.log('Form Errors:', this.profileForm.errors); // Log validation errors
-    console.log('Controls:', this.profileForm.controls);
+    //console.log('Controls:', this.profileForm.controls);
 
     const usernameControl = this.profileForm.get('username');
     const passwordControl = this.profileForm.get('password');

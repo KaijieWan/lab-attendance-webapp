@@ -10,6 +10,8 @@ import { NewRoleDialogComponent } from './newRoleDialog.component';
 import { catchError, map, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
 import { ToastrService, ToastrModule } from 'ngx-toastr';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from '../../lib/auth.interceptor';
 
 interface RolePermission {
   permissionType: string,
@@ -22,6 +24,13 @@ interface RolePermission {
   templateUrl: './accManagement.component.html',
 
   imports: [ReactiveFormsModule, RouterOutlet, DatePipe, CommonModule, MatDialogModule, MatButtonModule],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true // Allow multiple interceptors
+    }
+  ],
   styleUrl: './accManagement.component.scss'
 })
 

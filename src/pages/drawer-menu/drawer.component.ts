@@ -3,13 +3,23 @@ import { AfterViewInit, Component } from '@angular/core';
 import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import { Router, RouterOutlet, RouterModule } from '@angular/router';
 import { UserService } from '../../service/user.service';
+import { ToastrService } from 'ngx-toastr';
+import { RolePermissionService } from '../../service/rolePermission.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { NewSemDialogComponent } from './newSemDialog.component';
+
+interface RolePermission{
+  permissionType: string,
+  actions: string[];
+}
 
 @Component({
   selector: 'app-drawer',
   standalone: true,
   templateUrl: './drawer.component.html',
 
-  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, RouterModule, CommonModule],
+  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, RouterModule, CommonModule, MatDialogModule, MatButtonModule],
   styleUrl: './drawer.component.scss'
 })
 
@@ -17,7 +27,9 @@ export class DrawerComponent {
   date = new Date();
   username: string = '';
   name: string = '';
-  constructor(private router: Router, private userService : UserService) {}
+  constructor(private router: Router, private userService : UserService, private toastr: ToastrService,
+    private rolePermissionService: RolePermissionService, private dialog: MatDialog
+  ) {}
 
   getCurrentAcadYear(){
     const now = new Date();
@@ -25,6 +37,12 @@ export class DrawerComponent {
     const year = now.getMonth()+1 < 8 ? now.getFullYear()-1 : now.getFullYear()
     return `${year}-${year+1} ${sem}`
   }
+
+  semesters = [
+    { title: 'AY2024/2025 Sem 1' },
+    { title: 'AY2024/2025 Sem 2' },
+    { title: 'AY2025/2026 Sem 1'},
+  ];
   
   ngOnInit() {
     // Set an interval to update the time every second
@@ -41,6 +59,59 @@ export class DrawerComponent {
       })
     }
     
+    const arrowIcon = document.getElementById('arrow-icon');
+    const semDropdown = document.getElementById('dropdown');
+    if(arrowIcon && semDropdown){
+      semDropdown.addEventListener('mouseover', () => {
+        arrowIcon.textContent = 'arrow_drop_up';
+      });
+      
+      semDropdown.addEventListener('mouseout', () => {
+          arrowIcon.textContent = 'arrow_drop_down';
+      });
+    }    
+  }
+
+  openAddSemDialog(){
+    console.log("openCreateUserDialog");
+    const sessionData = sessionStorage.getItem('userDetails');
+    if (!sessionData) {
+      //Perhaps use a toastr to display denied message
+      console.log("openCreateUserDialog: sessionData not found");
+      this.toastr.error("Access To Adding New Semester Denied", "ERROR");
+    }
+    else{
+      console.log("openCreateUserDialog: sessionData found");
+      const userDetails = JSON.parse(sessionData);
+      console.log(userDetails.user.role);
+      this.rolePermissionService.getRolePermissions(userDetails.user.role.toString()).subscribe({
+        next: (response: RolePermission[]) => {
+          const permission = response.find(
+            (item) => item.permissionType === 'add_new_semester'
+          );
+          console.log(permission);
+          
+          if (!permission || !permission.actions.includes('allow')) {
+            //Perhaps use a toastr to display denied message
+            console.log("Permission for adding new semesters not found")
+            this.toastr.error("Access To Adding New Semester Denied", "ERROR");
+          }
+          else{
+            const dialogRef = this.dialog.open(NewSemDialogComponent, {
+              width: '700px',
+              panelClass: 'custom-dialog-container',
+              //data: { name: 'Angular User' }, // Optional data to pass to dialog
+            });
+      
+            dialogRef.afterClosed().subscribe(result => {
+              console.log('Dialog closed. Result:', result);
+            });
+          }
+          console.log("Permission check completed")
+        },
+        error: (err) => console.log("Error in permission check", err)
+      });      
+    }
   }
 
   navigateToDashboard(){

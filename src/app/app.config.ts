@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { CanActivateFn, provideRouter } from '@angular/router';
 import { GoogleLoginProvider, SocialLoginModule, SocialAuthServiceConfig} from '@abacritt/angularx-social-login';
 import { MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalService, MsalGuard, MsalBroadcastService, MsalInterceptor, MsalGuardConfiguration, MsalInterceptorConfiguration } from '@azure/msal-angular';
@@ -6,10 +6,12 @@ import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
-import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { provideToastr } from 'ngx-toastr';
+import { MatNativeDateModule } from '@angular/material/core';
+import { AuthInterceptor } from '../lib/auth.interceptor';
 
 /*
 // Define MSAL instance
@@ -72,5 +74,12 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(),
         provideAnimations(),
         provideToastr(),
+        importProvidersFrom(MatNativeDateModule),
+        provideHttpClient(withInterceptorsFromDi()),
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: AuthInterceptor,
+          multi: true // Allow multiple interceptors
+        }
       ],
     };    

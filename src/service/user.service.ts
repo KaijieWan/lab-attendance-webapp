@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 import { errorContext } from 'rxjs/internal/util/errorContext';
+import { backend_api } from '../environments/environment';
 
 export interface LoginRequest {
   username: string;
@@ -76,8 +77,8 @@ export interface CreateUserRequest{
   providedIn: 'root',
 })
 export class UserService {
-  private authUrl = 'http://localhost:8081/api/auth'; // Backend Auth URL
-  private userUrl = 'http://localhost:8081/api/v1/users'
+  private authUrl = `${backend_api}/api/auth`; // Backend Auth URL
+  private userUrl = `${backend_api}/api/v1/users`;
   unsubscribe: any;
 
   constructor(private http: HttpClient) {}
@@ -121,6 +122,19 @@ export class UserService {
         return response.status;
       })
     );
+  }
+
+  checkValidToken(token: string, username: string): Observable<boolean> {
+    return this.http.post<any>(`${this.authUrl}/is-valid?token=${token}&username=${username}`, '').pipe(
+      map((response) => {
+        console.log(response);
+        if(response.status=="INVALID"){
+          return false;
+        }
+        return true
+      }),
+      catchError(() => of(false)) 
+    )
   }
 
   checkExpiredToken(token: string): Observable<Boolean> {

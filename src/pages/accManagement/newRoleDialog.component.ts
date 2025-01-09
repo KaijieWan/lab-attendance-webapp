@@ -43,7 +43,8 @@ export class NewRoleDialogComponent {
 
     functions = [
         { title: 'Role Management'},
-        { title: 'Create New User'}
+        { title: 'Create New User'},
+        { title: 'Add New Semester'}
     ]
     
     pages_actions = ['Read', 'Write', 'Delete'];

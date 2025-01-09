@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 import { errorContext } from 'rxjs/internal/util/errorContext';
+import { backend_api } from '../environments/environment';
 
 export interface MessageResponse {
   message: string;
@@ -12,7 +13,7 @@ export interface MessageResponse {
     providedIn: 'root',
   })
   export class RolePermissionService {
-    private rolePermissionUrl = 'http://localhost:8081/api/v1/roles'
+    private rolePermissionUrl = `${backend_api}/api/v1/roles`;
 
     constructor(private http: HttpClient) {}
 
