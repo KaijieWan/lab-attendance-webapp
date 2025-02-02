@@ -12,7 +12,7 @@ export interface MessageResponse {
 @Injectable({
     providedIn: 'root',
   })
-  export class ClassGroupService {
+export class ClassGroupService {
     private classGroupUrl = `${backend_api}/api/v1/classGroup`;
     private classGroupEnrolledStudents = `${backend_api}/api/v1/classGroupEnrolledStudents`;
 
@@ -26,4 +26,8 @@ export interface MessageResponse {
       return this.http.post<MessageResponse>(`${this.classGroupEnrolledStudents}/createNewClassGroupEnrolledStudents`, enrolment);
     }
 
-  }
+    fetchClassGroupsByModuleAndSemester(moduleCode: string, semesterID: string) : Observable<any> {
+      return this.http.get<MessageResponse>(`${this.classGroupUrl}/specificClassGroups?module=${moduleCode}&semesterID=${semesterID}`);
+    }
+
+}

@@ -61,7 +61,20 @@
                       </label>      
                     </div>           
                 </li>
+
+                <li>
+                  <div class="permissions-container">
+                    <span class="title">Reports To:</span>
+
+                    <label class="container" *ngFor="let item of distinctRoles">
+                      {{ item }}
+                      <input type="checkbox" (change)="onCheckboxChangeCreateRole($event, item)">
+                      <span class="checkmark"></span>
+                    </label>      
+                  </div>           
+                </li>
               </ul> 
+
             </form>
           </div>
 
@@ -103,7 +116,21 @@
                       </label>      
                     </div>           
                 </li>
-              </ul>                             
+
+                <li>
+                  <div class="permissions-container">
+                    <span class="title">Reports To:</span>
+
+                    <label class="container" *ngFor="let item of distinctRoles">
+                      {{ item }}
+                      <input type="checkbox" (change)="onCheckboxChangeUpdateRole($event, item)"
+                      [checked]="isReportingRoleChecked(item)">
+                      <span class="checkmark"></span>
+                    </label>      
+                  </div>           
+                </li>
+              </ul>                          
+
             </form>            
           </div>
         </div>

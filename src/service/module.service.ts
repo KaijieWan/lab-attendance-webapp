@@ -18,7 +18,11 @@ export interface MessageResponse {
     constructor(private http: HttpClient) {}
 
     createModule(module: any) : Observable<MessageResponse> {
-        return this.http.post<MessageResponse>(`${this.moduleUrl}/createNewModule`, module);
+      return this.http.post<MessageResponse>(`${this.moduleUrl}/createNewModule`, module);
+    }
+
+    getAllModules() : Observable<any> {
+      return this.http.get<MessageResponse>(`${this.moduleUrl}`);
     }
 
   }

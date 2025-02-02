@@ -9,6 +9,11 @@ export interface MessageResponse {
   status: string;
 }
 
+export interface StudentDTO {
+  Student_ID: string;
+  fullName: string;
+}
+
 @Injectable({
     providedIn: 'root',
   })
@@ -19,6 +24,10 @@ export interface MessageResponse {
 
     createStudent(student: any) : Observable<MessageResponse> {
         return this.http.post<MessageResponse>(`${this.studentUrl}/createNewStudent`, student);
+    }
+
+    getAllStudents() : Observable<any> {
+      return this.http.get<any>(`${this.studentUrl}`);
     }
 
   }

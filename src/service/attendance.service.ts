@@ -21,4 +21,12 @@ export interface MessageResponse {
       return this.http.post<MessageResponse>(`${this.attendanceUrl}/createNewAttendance`, newAttendance);
     }
 
+    getAllAttendancesByLabSessionId(labSessionId: string) : Observable<any> {
+      return this.http.get<any>(`${this.attendanceUrl}/getAttendanceByLabSessionId?labSessionId=${labSessionId}`);
+    }
+
+    markAttendance(attendancePaylaod: any) : Observable<MessageResponse> {
+      return this.http.put<MessageResponse>(`${this.attendanceUrl}/markAttendance`, attendancePaylaod);
+    }
+
   }

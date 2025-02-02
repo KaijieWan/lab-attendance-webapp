@@ -1,0 +1,99 @@
+body {
+    margin-left: 5%;
+}
+
+.diagram-complex-hierarchical-tree .image-pattern-style {
+    background-color: white;
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 75px;
+    width: calc((100% - 18px) / 3);
+    cursor: pointer;
+    border: 1px solid #D5D5D5;
+    background-position: center;
+    float: left;
+}
+
+.diagram-complex-hierarchical-tree .row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.diagram-complex-hierarchical-tree .sb-child-row {
+    padding-top: 8px;
+}
+
+.diagram-complex-hierarchical-tree .row-header {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.diagram-complex-hierarchical-tree .e-selected-style {
+    border-color: #006CE6;
+    border-width: 2px;
+}
+
+.diagram-complex-hierarchical-tree .e-checkbox-wrapper .e-label {
+    font-size: 12px;
+}
+
+.diagram-complex-hierarchical-tree .col-xs-6 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.slider-container {
+    display: flex;
+    position: relative;
+    justify-content: space-around;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+  }
+
+  .slider-container button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 16px;
+    position: relative;
+  }
+
+  .slider-container button.active {
+    font-weight: bold;
+    color: blueviolet;
+  }
+
+  .slider {
+    position: absolute;
+    bottom: 0;
+    height: 3px;
+    width: 50%;
+    background: #1976d2;
+    transition: transform 0.3s ease;
+  }
+  
+  .slider.users {
+    transform: translateX(-50%);
+  }
+  
+  .slider.roles {
+    transform: translateX(50%);
+  }
+
+  .back {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    justify-self: left;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 3px 3px #888888; 
+}
+
+.back:hover {
+  background-color: #2980b9;
+}

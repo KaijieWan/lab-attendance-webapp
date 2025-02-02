@@ -4,6 +4,10 @@ import { AppComponent } from './app/app.component';
 import { LoginComponent } from './pages/login/login.component';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
+import { registerLicense } from '@syncfusion/ej2-base';
+
+// Registering Syncfusion license key
+registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCfEx0Qnxbf1x1ZFRGalxUTnJbUj0eQnxTdEBjWH1WcnZVQ2VcU0xyXw==');
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));

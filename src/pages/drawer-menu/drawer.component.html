@@ -90,37 +90,31 @@
                 </h1>
             </div>
             <div class="navbar-links">  
-                <p style="margin-top:0" >
+                <!--<p style="margin-top:0" >
                     Academic Year: 
                     <span name="academicYear">{{ getCurrentAcadYear() }}</span>
-                </p>
-                <p style="margin-top:-1%">
+                </p>-->
+                <p style="margin-top:0">
                     Date:
                     <span name="currentDate">{{ date | date: 'dd/MM/yyyy, h:mm a'}}</span>
                 </p>
-
+                <p style="color: springgreen;">Select Semester Below:</p>
                 <div class="dropdown" id="dropdown">
-                    <span>AY 2024/2025</span>
                     <span class="material-symbols-outlined" id="arrow-icon">
                         arrow_drop_down
                     </span>
+                    <span *ngIf="semesterID"><a>{{ semesterID }}</a></span>                                    
                     
-                    <!--<button class="dropdown-toggle"><b>AY 2024/2025</b>
-                        <span class="material-symbols-outlined">
-                            arrow_drop_down
-                        </span>
-                    </button>-->
-                    
-                    <div class="dropdown-menu">
-                      <ul>                        
-                        <li *ngFor="let item of semesters" [value]="item"><a href="#">{{ item.title }}</a></li>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                      <ul id="dropdownList">                        
+                        <li *ngFor="let item of semesters" [value]="item" (click)="changeSemester(item.semester_ID)"><a>{{ item.semester_ID }}</a></li>
                       </ul>
                       <div class="dropdown-footer">
                         <button class="btn btn-primary" (click)="openAddSemDialog()">Add New Semester</button>
                         <!-- <button class="btn btn-secondary">Cancel</button> -->
                       </div>
                     </div>
-                  </div>
+                </div>
 
                 <span *ngIf="username" style="text-align: end; margin-right: 4%; color: bisque; margin-top: 5%;">
                     Username: {{ username }}
@@ -136,6 +130,7 @@
             <!-- Dynamic content will be rendered here -->
             <router-outlet></router-outlet>
         </div>
+
     </body>
 
 </html>

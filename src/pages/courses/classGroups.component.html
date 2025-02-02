@@ -7,20 +7,15 @@
         <title>Responsive Sidebar Menu</title>
         <!-- Linking Google Font link for icons-->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-        <link rel="stylesheet" href="courses.component.scss">
+        <link rel="stylesheet" href="classGroups.component.scss">
     </head>
     <body>
-      <h2 style="text-align: center; margin-bottom: 10px;">Courses</h2>
+        <h2 style="text-align: center; margin-bottom: 10px;" *ngIf="courseId">Lab Groups ({{courseId}})</h2>
         <ul class="links">
-            <li *ngFor="let course of semesterCourses">
+            <li *ngFor="let classGroup of classGroups">
                 <div class="permissions-container">
-                  <a (click)="navigateToLabGroups(course)"><span class="title">{{ course }}</span></a>
-    
-                  <!--<label class="container" *ngFor="let course of semesterCourses">
-                    {{ action }}
-                  </label>-->
-    
+                  <a (click)="navigateToLabSessions(classGroup.classGroupId.classGroupID)"><span class="title">{{ classGroup.classGroupId.classGroupID }}</span></a>    
                 </div>
-        </ul>           
+        </ul>
     </body>
 </html>

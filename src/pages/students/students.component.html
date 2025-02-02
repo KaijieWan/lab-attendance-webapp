@@ -10,7 +10,51 @@
         <link rel="stylesheet" href="students.component.scss">
     </head>
     <body>
-        <h1>Students Section</h1>
-        <p>Content for Students goes here.</p>
+      <div>
+        <h2 style="text-align: center; margin-bottom: 10px; align-content: center;">All Students Details</h2>
+        <div class="searchContainer">
+          <input 
+            type="text" 
+            (input)="onSearchInput($event)" 
+            placeholder="Search students..."
+            class="searchBox"
+          />
+        </div>
+          <div class="student-list">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Student ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let student of studentsToDisplay">
+                  <td>{{ student.fullName }}</td>
+                  <td>{{ student.Student_ID }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <button
+              [disabled]="currentPage === 0"
+              (click)="onPageChange(currentPage - 1)"
+            >
+              Previous
+            </button>
+            
+            <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+            
+            <button
+              [disabled]="currentPage + 1 >= totalPages"
+              (click)="onPageChange(currentPage + 1)"
+            >
+              Next
+            </button>
+          </div>
+      </div>
+                  
     </body>
 </html>

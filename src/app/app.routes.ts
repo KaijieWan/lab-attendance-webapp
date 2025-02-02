@@ -17,6 +17,8 @@ import { ErrorComponent } from '../pages/error/error.component';
 import { AuthGuard } from './auth.guard';
 import { PermissionGuard } from './permission.guard';
 import { AccessDeniedComponent } from '../pages/error/accessDenied.component';
+import { ClassGroupsComponent } from '../pages/courses/classGroups.component';
+import { AccHierarchyComponent } from '../pages/accManagement/accHierarchy.component';
 
 export const routes: Routes = [
     //{ path: '', component: LoginComponent },
@@ -28,10 +30,23 @@ export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
     { path: 'drawer', component: DrawerComponent, canActivate: [AuthGuard],
         children: [
-            { path: 'dashboard', component: DashboardComponent },
+            { path: 'dashboard', component: DashboardComponent },            
             { path: 'courses', component: CoursesComponent,
-                canActivate: [PermissionGuard], data: {permissionType: 'courses_page'}
+                canActivate: [PermissionGuard], data: {permissionType: 'courses_page'},
              },
+            {
+                path: 'courses/:id/labgroups',
+                //component: ClassGroupsComponent
+                loadComponent: () => import('../pages/courses/classGroups.component').then(m => m.ClassGroupsComponent)
+            },
+            /*{
+                path: 'courses/:id/labgroups/:classGroupId',
+                loadComponent: () => import('../pages/courses/labSessions.component').then(m => m.LabSessionsComponent)
+            },*/
+            {
+                path: 'courses/:id/labgroups/:classGroupId',
+                loadComponent: () => import('../pages/courses/labSessionDetails.component').then(m => m.LabSessionDetailsComponent)
+            },            
             { path: 'students', component: StudentsComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'students_page'}
              },
@@ -43,6 +58,8 @@ export const routes: Routes = [
              },
             { path: 'profile', component: ProfileComponent },
             { path: 'accManagement', component: AccManagementComponent,
+                canActivate: [PermissionGuard], data: {permissionType: 'accounts_management_page'} },
+            { path: 'accManagement/accHierarchy', component: AccHierarchyComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'accounts_management_page'} },
             { path: 'settings', component: SettingsComponent },
             //{ path: 'dashboard', component: DashboardComponent },

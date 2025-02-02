@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { AfterViewInit, Component, Inject } from '@angular/core';
-import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormBuilder} from '@angular/forms';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormBuilder, FormArray} from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../service/user.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -32,6 +32,7 @@ export class NewRoleDialogComponent {
 
     errorMessage: string = '';
     toUpdateRole: string = '';
+    reportingRoles: string[] = [];
 
     pages = [
         { title: 'Courses Page' },
@@ -70,10 +71,12 @@ export class NewRoleDialogComponent {
     ngOnInit() {
         this.rolePermissionsForm = this.fb.group({
             create_role: new FormControl('', Validators.required),
+            reports_to: this.fb.array([]),
         });
 
         this.updateRoleForm = this.fb.group({
             update_role: new FormControl('', Validators.required),
+            reports_to: this.fb.array([]),
         });
     
         // Dynamically create form controls for each page and action [Create role]
@@ -127,6 +130,7 @@ export class NewRoleDialogComponent {
         this.rolePermissionService.getRolePermissions(role).subscribe({
             next: (response) => {
                 this.displayPermissions = response;
+                this.reportingRoles = this.displayPermissions[0].reportsTo.split(',');
                 this.displayPermissions.forEach(item => {
                     const actions = item.actions.split(',');
                     this.selectedPermissions[item.permissionType] = actions;
@@ -193,10 +197,44 @@ export class NewRoleDialogComponent {
             delete this.selectedPermissions[permission];
           }
         }
-    }
+      }
 
     onClose(): void {
         this.dialogRef.close();
+    }
+
+    onCheckboxChangeCreateRole(event: any, item: string) {
+      const reportsTo: FormArray = this.rolePermissionsForm.get('reports_to') as FormArray;
+    
+      if (event.target.checked) {
+        // Add item if checked
+        reportsTo.push(new FormControl(item));
+      } else {
+        // Remove item if unchecked
+        const index = reportsTo.controls.findIndex(x => x.value === item);
+        if (index > -1) {
+          reportsTo.removeAt(index);
+        }
+      }
+    }
+
+    onCheckboxChangeUpdateRole(event: any, item: string){
+      const reportsTo: FormArray = this.updateRoleForm.get('reports_to') as FormArray;
+    
+      if (event.target.checked) {
+        // Add item if checked
+        reportsTo.push(new FormControl(item));
+      } else {
+        // Remove item if unchecked
+        const index = reportsTo.controls.findIndex(x => x.value === item);
+        if (index > -1) {
+          reportsTo.removeAt(index);
+        }
+      }
+    }
+
+    isReportingRoleChecked(reportingRole: string){
+      return this.reportingRoles?.includes(reportingRole) || false;
     }
 
     createRole(){
@@ -234,6 +272,7 @@ export class NewRoleDialogComponent {
 
         const payload = {
             role: this.rolePermissionsForm.value.create_role,
+            reportsTo: this.rolePermissionsForm.value.reports_to.join(','),
             permissions: permissions,
         };
 
@@ -299,6 +338,7 @@ export class NewRoleDialogComponent {
 
         const payload = {
             role: this.toUpdateRole,
+            reportsTo: this.updateRoleForm.value.reports_to.join(','),
             permissions: permissions,
         };
 

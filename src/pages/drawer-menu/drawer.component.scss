@@ -1,10 +1,9 @@
 /*Import google font - Poppins*/
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: "Poppins", sans-serif;    
 }
 
 body {
@@ -14,6 +13,7 @@ body {
 }
 
 .sidebar {
+    z-index: 1000;
     position: fixed;
     top: 0;
     left: 0;
@@ -197,7 +197,7 @@ body {
 
 .dropdown {
     margin-top: 5%;
-    margin-left: 40%;
+    margin-left: 18%;
     width: 155px;
     background-color: #007bff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -205,6 +205,7 @@ body {
     padding: 8px;
     color: #ddd;
     border-radius: 6px;
+    cursor: pointer;
 }
   
   /* Style the dropdown menu */
@@ -216,13 +217,12 @@ body {
     min-width: 220px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border: 1px solid #ddd;
-    z-index: 1000;
+    z-index: 1100 !important;
     padding: 10px;
     border-radius: 4px;
   }
-  
-  /* Show the dropdown menu when the toggle button is clicked */
-  .dropdown:hover .dropdown-menu {
+
+  .dropdown:hover .dropdown-menu{
     display: block;
   }
   
@@ -244,6 +244,7 @@ body {
   
   .dropdown-menu ul li:hover {
     background-color: #f1f1f1;
+    cursor: pointer;
   }
   
   /* Style the footer with buttons */

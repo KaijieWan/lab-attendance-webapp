@@ -1,3 +1,63 @@
 body {
-    margin-left: 30%;
+    margin: 0;
+    //height: 100vh; /* Ensure the body spans the full height of the viewport */
+    display: flex; /* Use Flexbox to align items */
+    justify-content: center; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
 }
+
+.student-list {
+    margin: 20px;
+    font-size: 15px;
+}
+  
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+  
+th, td {
+    //border: 0px solid #ddd;
+    font-size: 12px;
+    padding: 14px 60px;
+    text-align: left;
+    border-bottom: 2px solid #3498db;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center; /* Center-align the elements horizontally */
+    align-items: center; /* Vertically align items in the center */
+    gap: 10px; /* Add spacing between elements */
+    margin: 20px; /* Add spacing above the pagination controls */
+}
+  
+.pagination button {
+    background-color: #3498db;
+    color: #fff;
+    margin: 0px 5px;
+    border-radius: 20px;
+    border: none;
+    padding: 5px 10px; /* Add padding to buttons for better UX */
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background-color: #2980b9;
+}
+
+.searchContainer {
+    justify-content: center;
+    justify-self: center;
+  }
+
+  .searchBox {
+    width: 250px;
+    font-size: 16px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+  }

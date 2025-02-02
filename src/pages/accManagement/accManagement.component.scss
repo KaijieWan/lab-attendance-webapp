@@ -92,6 +92,7 @@ button.leave {
 }
   
 table {
+    margin-top: 10px;
     width: 100%;
     border-collapse: collapse;
 }
@@ -101,6 +102,15 @@ th, td {
     padding: 14px 40px;
     text-align: left;
     border-bottom: 2px solid #3498db;
+    //cursor: pointer;
+}
+
+.table_header {
+    cursor: pointer;
+}
+
+.table_header:hover {
+    background-color: #f1f1f1;
 }
   
 .pagination {
@@ -165,3 +175,77 @@ th, td {
     border-radius: 20px;
 }
   
+.filter {
+    flex-direction: row;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    justify-content: flex-start;
+    gap: 5px;
+    margin-top: 3%;
+    cursor: pointer;
+}
+
+.filter_status {
+    flex-direction: row;
+    display: flex;
+    gap: 5px;
+    margin-left: 84%;
+    margin-top: 0%;
+    cursor: pointer;
+    display: none;
+    color: #888888;
+}
+
+.filter_status:hover {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+.filter:hover {
+    background-color: #f1f1f1;
+}
+
+.filter_list {
+    //margin-top: 2%;
+    //margin-left: 2%;
+    top: 90%;
+    display: none; /* Initially hidden */
+    position: absolute;
+    background-color: #fff;
+    min-width: 220px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    z-index: 1000;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  /* Style the list of options */
+  .filter_list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .filter_list ul li {
+    padding: 8px 10px;
+  }
+  
+  .filter_list ul li a {
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .filter_list ul li:hover {
+    background-color: #f1f1f1;
+  }
+
+  .searchContainer {
+    margin-bottom: -4%;
+  }
+
+  .searchBox {
+    width: 300px;
+    font-size: 16px;
+  }

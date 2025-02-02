@@ -577,7 +577,7 @@ export class NewSemDialogComponent {
             }
 
             // If any courses does not exist, create them
-            /*console.log("Attempting to create new module if it does not exist");
+            console.log("Attempting to create new module if it does not exist");
             const courseModulePayload = {
               moduleCode: courseCode
             };
@@ -642,7 +642,7 @@ export class NewSemDialogComponent {
               }
             })            
             this.toastr.success("Created Module!", "SUCCESS"); 
-            this.toastr.success("Created Class Group!", "SUCCESS");*/
+            this.toastr.success("Created Class Group!", "SUCCESS");
             
           }
           console.log(labDataMap);

@@ -8,6 +8,7 @@ import { UserService } from '../../service/user.service';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Toast, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-forget-pass',

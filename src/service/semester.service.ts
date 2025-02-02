@@ -9,6 +9,13 @@ export interface MessageResponse {
   status: string;
 }
 
+export interface SemesterDTO {
+  semester_ID: string;
+  semester: string;
+  annualYear: string;
+  week1StartDate: Date;
+}
+
 @Injectable({
     providedIn: 'root',
   })
@@ -19,6 +26,10 @@ export interface MessageResponse {
 
     createSemester(newSemester: any) : Observable<MessageResponse> {
       return this.http.post<MessageResponse>(`${this.semesterUrl}/createNewSemester`, newSemester);
+    }
+
+    getAllSemesters() : Observable<any> {
+      return this.http.get<MessageResponse>(`${this.semesterUrl}`);
     }
 
   }

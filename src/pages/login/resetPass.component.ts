@@ -8,6 +8,7 @@ import { UserService } from '../../service/user.service';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { debounceTime, delay, map, Observable, of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-reset-pass',
@@ -26,9 +27,10 @@ export class ResetPassComponent{
   token: string | null = null;
   errorMessage: string = '';
   successMessage = '';
-  //Need to figure out a way to extract the token from the url provided and also to check the validity of the token before allowing access to the page
   //If invalid deny reset password portion, if valid show the rest of the reset password portion
-  constructor(private router: Router, private userService : UserService, private route: ActivatedRoute) {}
+  constructor(private router: Router, private userService : UserService, private route: ActivatedRoute,
+    private toastr: ToastrService,
+  ) {}
 
   ngOnInit(): void {
     // Set an interval to update the time every second
@@ -131,9 +133,10 @@ export class ResetPassComponent{
             this.successMessage = 'Password reset successful'
             this.errorMessage = '';
             setTimeout(() => {
-              console.log("Wait for 3 secs")
+              console.log("Wait for 2 secs")
+              this.toastr.success("Password reset successful", "SUCCESS")
               this.router.navigate(['/login']); // Redirect to login
-            }, 3000);
+            }, 2000);
           }
           else{
             this.errorMessage = 'Password reset failed'

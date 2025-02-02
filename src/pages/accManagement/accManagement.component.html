@@ -5,12 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Responsive Sidebar Menu</title>
         <!-- Linking Google Font link for icons-->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <link rel="stylesheet" href="accManagement.component.scss">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />        
     </head>
     <body>
         <div>
-            <h2 style="text-align: center; margin-bottom: 10px;">Accounts Management</h2>
+          <div style="display: flex; position: relative; align-items: center; justify-content: center; width: 100%;">
+            <h2>Accounts Management</h2>
+            <button mat-raised-button (click)="navigateToHierarchy()"  style="position: absolute; right: 0;background-color: skyblue;"> 
+              <span class="material-symbols-outlined">
+                family_history </span>
+              <b>Display Hierarchical View</b> </button>  
+          </div>            
             <div class="popup-box">
                 <div class="new_settings">
                   <button mat-raised-button (click)="openNewRoleDialog()"> 
@@ -20,20 +26,55 @@
                   <button mat-raised-button (click)="openCreateUserDialog()"> 
                     <span class="material-symbols-outlined">
                       person_add </span>
-                    Create New User </button>
+                    Create New User </button>                    
                 </div>
+                <div class="filter_status" id="filter_status" (click)="clearFilter()">
+                  <span class="material-symbols-outlined">
+                    close
+                    </span>
+                  Clear Filter/Sort
+                </div>
+
+                <div class="searchContainer">
+                  <input 
+                    type="text" 
+                    (input)="onSearchInput($event)" 
+                    placeholder="Search users..."
+                    class="searchBox"
+                  />
+                </div>
+                
+                
                 <div class="user-list">
                     <table>
                       <thead>
                         <tr>
-                          <th>Username</th>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Role</th>
+                          <th id="username_header"><span class="table_header" (click)="onSort('username')"><span class="material-symbols-outlined" style="padding-top: 3px;">
+                            swap_vert
+                            </span>Username</span></th>
+                          <th id="name_header"><span class="table_header" (click)="onSort('name')"><span class="material-symbols-outlined" style="padding-top: 3px;">
+                            swap_vert
+                            </span>Name</span></th>
+                          <th id="email_header"><span class="table_header" (click)="onSort('email')"><span class="material-symbols-outlined" style="padding-top: 3px;">
+                            swap_vert
+                            </span>Email</span></th>
+                          <th>
+                            <div class="filter" id="filter">                              
+                              <span class="material-symbols-outlined" style="padding-top: 3px;">
+                                filter_list
+                                </span>
+                                Role
+                                <div class="filter_list" id="filter_list">
+                                  <ul>                        
+                                    <li *ngFor="let item of roles" [value]="item" (click)="onRoleSelected(item)">{{ item }}</li>
+                                  </ul>
+                                </div>                    
+                            </div>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let user of users">
+                        <tr *ngFor="let user of usersToDisplay">
                           <td>{{ user.username }}</td>
                           <td>{{ user.name }}</td>
                           <td>{{ user.email }}</td>
