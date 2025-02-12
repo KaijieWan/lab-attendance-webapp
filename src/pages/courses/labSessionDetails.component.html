@@ -74,7 +74,7 @@
                     </div>                    
                     
                  <td>
-                  <button mat-raised-button> 
+                  <button mat-raised-button (click)="openRemarksDialog(attendance.student.fullName, attendance.remarks, attendance.attendance_ID)"> 
                     Click To <br> View Remarks </button> 
                  </td>                                         
                 </tr>

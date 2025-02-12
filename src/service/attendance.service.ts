@@ -29,4 +29,8 @@ export interface MessageResponse {
       return this.http.put<MessageResponse>(`${this.attendanceUrl}/markAttendance`, attendancePaylaod);
     }
 
+    updateRemarks(remarksPayload: any) : Observable<MessageResponse> {
+      return this.http.put<MessageResponse>(`${this.attendanceUrl}/updateRemarks`, remarksPayload);
+    }
+
   }

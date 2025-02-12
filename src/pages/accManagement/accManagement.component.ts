@@ -12,6 +12,8 @@ import { RolePermissionService } from '../../service/rolePermission.service';
 import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from '../../lib/auth.interceptor';
+import { AccHierarchyComponent } from './accHierarchy.component';
+
 
 interface RolePermission {
   permissionType: string,
@@ -23,7 +25,7 @@ interface RolePermission {
   standalone: true,
   templateUrl: './accManagement.component.html',
 
-  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, CommonModule, MatDialogModule, MatButtonModule],
+  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, CommonModule, MatDialogModule, MatButtonModule, AccHierarchyComponent],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
@@ -37,6 +39,8 @@ interface RolePermission {
 export class AccManagementComponent {
   users: UserDTO[] = [];
   usersToDisplay: UserDTO[] = [];
+  filtererdUsersBasedOnRole: UserDTO[] = [];
+  roleFiltered: boolean = false;
   roles: string[] = [];
   totalPages = 0;
   currentPage = 0;
@@ -72,7 +76,18 @@ export class AccManagementComponent {
         distinctUntilChanged() // Only emit if value changes
       )
       .subscribe((term) => {
-        this.usersToDisplay = term
+        if(this.roleFiltered){
+          this.usersToDisplay = term
+          ? this.filtererdUsersBasedOnRole.filter(user =>
+              user.name.toLowerCase().includes(term.toLowerCase()) ||
+              user.role.toLowerCase().includes(term.toLowerCase()) ||
+              user.email.toLowerCase().includes(term.toLowerCase()) ||
+              user.username.toLowerCase().includes(term.toLowerCase())
+            )
+          : [...this.filtererdUsersBasedOnRole];
+        }
+        else{
+          this.usersToDisplay = term
           ? this.users.filter(user =>
               user.name.toLowerCase().includes(term.toLowerCase()) ||
               user.role.toLowerCase().includes(term.toLowerCase()) ||
@@ -80,6 +95,7 @@ export class AccManagementComponent {
               user.username.toLowerCase().includes(term.toLowerCase())
             )
           : [...this.users];
+        }        
       });
   }
 
@@ -99,6 +115,9 @@ export class AccManagementComponent {
 
   onRoleSelected(role: string){
     this.usersToDisplay = this.users.filter(user => user.role === role);
+    this.filtererdUsersBasedOnRole = this.users.filter(user => user.role === role);
+    this.roleFiltered = true;
+
     const filterList = document.getElementById('filter_list');
     const filterStatus = document.getElementById("filter_status");
     if (filterList && filterStatus) {
@@ -130,6 +149,7 @@ export class AccManagementComponent {
 
   clearFilter() {
     this.usersToDisplay = [...this.users];
+    this.roleFiltered = false;
     const filterStatus = document.getElementById("filter_status");
     if (filterStatus) {
       filterStatus.style.display = "none"; // Hide the filter list
@@ -247,5 +267,10 @@ export class AccManagementComponent {
 
   navigateToHierarchy(){
     this.router.navigate([`/drawer/accManagement/accHierarchy`])
+  }
+
+  handleNodeClick(roleName: string) {
+    console.log('Received node click event from child:', roleName);
+    this.onRoleSelected(roleName);
   }
 }

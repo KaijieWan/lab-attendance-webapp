@@ -21,7 +21,7 @@ export class AppComponent{
 }
 
 // Bootstrap the application using the routes
-import { bootstrapApplication } from '@angular/platform-browser';
+import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { AuthInterceptor } from '../lib/auth.interceptor';
 
@@ -34,6 +34,6 @@ bootstrapApplication(AppComponent, {
         provide: HTTP_INTERCEPTORS,
         useClass: AuthInterceptor,
         multi: true // Allow multiple interceptors
-      }
+      },
     ],
 });

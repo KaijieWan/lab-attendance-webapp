@@ -19,6 +19,7 @@ import { PermissionGuard } from './permission.guard';
 import { AccessDeniedComponent } from '../pages/error/accessDenied.component';
 import { ClassGroupsComponent } from '../pages/courses/classGroups.component';
 import { AccHierarchyComponent } from '../pages/accManagement/accHierarchy.component';
+import { LabCalendarComponent } from '../pages/labSchedules/labCalendar.component';
 
 export const routes: Routes = [
     //{ path: '', component: LoginComponent },
@@ -53,6 +54,10 @@ export const routes: Routes = [
             { path: 'labSchedules', component: LabSchedulesComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'lab_schedules_page'}
              },
+             {
+                path: 'labSchedules/labCalender/:lab',
+                loadComponent: () => import('../pages/labSchedules/labCalendar.component').then(m => m.LabCalendarComponent)
+            },      
             { path: 'absences', component: AbsencesComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'absences_page'}
              },

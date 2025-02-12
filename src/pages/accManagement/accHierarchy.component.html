@@ -11,10 +11,10 @@
     </head>
     <body>
         <div style="display: flex; position: relative; align-items: center; justify-content: space-between; width: 100%;">
-          <button class="back" (click)="goBack()">⬅ Back</button>
-          <h2 style="text-align: center; margin: 0 auto;">Accounts Hierarchical View</h2>        
+          <!--<button class="back" (click)="goBack()">⬅ Back</button>-->
+          <h2 style="text-align: center; margin: 0 auto;">Roles Hierarchical View</h2>        
         </div>        
-        <div mat-dialog-title>
+        <!--<div mat-dialog-title>
             <div class="slider-container">
               <button
                 [class.active]="currentView === 'users'"
@@ -28,15 +28,16 @@
               </button>
               <div class="slider" [class.users]="currentView === 'users'" [class.roles]="currentView === 'roles'"></div>
             </div>
-        </div>
+        </div>-->
 
-        <div *ngIf="currentView === 'users'">
+        <!--<div *ngIf="currentView === 'users'">
             <ejs-diagram id="diagram" width="100%" height="580px" [layout]='layout' [dataSourceSettings]='dataSourceSettings' [getNodeDefaults]='nodeDefaults' [getConnectorDefaults]='connectorDefaults'>
             </ejs-diagram>
-        </div>
+        </div>-->
 
         <div *ngIf="currentView === 'roles'">
-            <ejs-diagram id="diagram" width="100%" height="580px" [layout]='layout' [dataSourceSettings]='dataSourceSettings' [getNodeDefaults]='nodeDefaults' [getConnectorDefaults]='connectorDefaults'>
+            <ejs-diagram id="diagram" width="100%" height="480px" [layout]='layout' [dataSourceSettings]='dataSourceSettings' [getNodeDefaults]='nodeDefaults' [getConnectorDefaults]='connectorDefaults'
+            (click)="click($event)">
             </ejs-diagram>
         </div>
         

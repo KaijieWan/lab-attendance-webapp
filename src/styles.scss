@@ -11,3 +11,8 @@
 @import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
 @import "../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
 @import "../node_modules/@syncfusion/ej2-navigations/styles/material.css";
+
+:root {
+  --fc-border-color: #3498db;
+  --fc-daygrid-event-dot-width: 5px;
+}

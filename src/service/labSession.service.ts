@@ -29,4 +29,8 @@ export interface MessageResponse {
       return this.http.get<any>(`${this.labSessionUrl}/specificLabSessions?classGroupId=${classGroupId}&moduleCode=${moduleCode}&semesterId=${semesterId}`);
     }
 
+    getLabSessionsByLabAndRoomAndSemester(lab: string, room: string, semester: string) : Observable<any>{
+      return this.http.get<any>(`${this.labSessionUrl}/getLabSessionsByLabAndRoomAndSemester?lab=${lab}&room=${room}&semester=${semester}`)
+    }
+
   }

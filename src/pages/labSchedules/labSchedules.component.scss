@@ -1,3 +1,60 @@
 body {
-    margin-left: 30%;
+    margin-left: 100px;
+    //margin: 0;
+    //height: 100vh; /* Ensure the body spans the full height of the viewport */
+    display: flex; /* Use Flexbox to align items */
+    justify-content: left; /* Horizontally center content */
+    align-items: center; /* Vertically center content */
+    flex-direction: column;
 }
+
+.permissions-container a{
+  display: flex;
+  align-items: center;
+  gap: 0 20px;
+  color: #ebe4e4e3;
+  font-weight: 500;
+  padding: 15px 10px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding: 0;
+    justify-content: left;
+    list-style-type: none;
+}
+
+.links li {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+  }
+
+.permissions-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: -10px;
+  }
+  
+  .permissions-container .title {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    background-color: #7bb6f6;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid #fff;
+    border-color: rgb(202, 194, 194);
+    padding: 20px;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .permissions-container .title:hover {
+    background-color: #007bff;
+  }

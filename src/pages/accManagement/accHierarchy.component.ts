@@ -1,12 +1,15 @@
 import { CommonModule, DatePipe } from "@angular/common";
-import { Component, ViewEncapsulation, ViewChild } from "@angular/core";
+import { Component, ViewEncapsulation, ViewChild, Output, EventEmitter } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { Router, RouterModule, RouterOutlet } from "@angular/router";
-import { ConnectorModel, DataBinding, DataSourceModel, Diagram, DiagramComponent, DiagramModule, DiagramTools, HierarchicalTree, IDropEventArgs, LayoutModel, NodeModel, ShapeStyleModel } from "@syncfusion/ej2-angular-diagrams";
+import { ConnectorModel, DataBinding, DataSourceModel, Diagram, DiagramComponent, DiagramModule, DiagramTools, HierarchicalTree, IDropEventArgs, 
+  LayoutModel, NodeModel, ShapeStyleModel, IClickEventArgs, 
+  AnnotationConstraints} from "@syncfusion/ej2-angular-diagrams";
 import { DataManager } from "@syncfusion/ej2-data";
 import { finalize } from "rxjs";
 import { RolePermissionService } from "../../service/rolePermission.service";
 import { UserService } from "../../service/user.service";
+import { ToastrService } from "ngx-toastr";
 
 export interface EmployeeInfo {
   Name: string;
@@ -46,12 +49,14 @@ export class AccHierarchyComponent {
   finalUsers: Object[] = [];
   distinctRoles: Role[] = [];
 
-  currentView: 'users' | 'roles' = 'users';
+  currentView: 'users' | 'roles' = 'roles';
 
   constructor(private rolePermissionService: RolePermissionService, private userService: UserService,
-    private router: Router
+    private router: Router, private toastr: ToastrService
   ){
   }
+
+  @Output() nodeClicked: EventEmitter<string> = new EventEmitter<string>();
 
   ngOnInit(){
     this.userService.getAllUsers(0, 100).subscribe({
@@ -60,14 +65,20 @@ export class AccHierarchyComponent {
         console.log("All users: ", this.users);
         this.fetchDistinctRoles();
       }
-    })    
+    })
+
+    this.diagram!.scrollSettings.canAutoScroll = false;
+    this.diagram!.scrollSettings.scrollLimit = "Infinity";
+    
+    
+    
   }
 
   switchView(view: 'users' | 'roles'): void {
     this.currentView = view;
 
     if(this.currentView == 'users'){
-      this.updateUsersModel();
+      //this.updateUsersModel();
     }
 
     if(this.currentView == 'roles'){
@@ -87,6 +98,15 @@ export class AccHierarchyComponent {
       if (this.diagram) {
         this.diagram.dataBind();
       }
+    }
+  }
+
+  click(args: IClickEventArgs) {
+    if (args.actualObject) {
+      const clickedNode = args.actualObject as NodeModel
+      //this.toastr.info("Node clicked");
+      this.toastr.info("Filter Role: " + clickedNode.annotations?.at(2)?.content);
+      this.nodeClicked.emit(clickedNode.annotations?.at(2)?.content);
     }
   }
 
@@ -166,23 +186,26 @@ export class AccHierarchyComponent {
 
     console.log("Final User List: ", this.finalUsers);    
 
-    this.updateUsersModel();
+    this.switchView('roles');
+    //this.updateUsersModel();
   }
 
   public dataSourceSettings?: DataSourceModel = {
-    id: "username",
-    parentId: "reportsTo",
-    dataManager: new DataManager(this.updatedUsers as JSON[]),
-    doBinding: (nodeModel: NodeModel, data: object) => {
-      nodeModel.annotations = [
-        { content: (data as UserInfo).name, style: { color: "white" } }
-      ];
-    }
+      id: "role",
+      parentId: "reportsTo",
+      dataManager: new DataManager(this.distinctRoles),
+      doBinding: (nodeModel: NodeModel, data: object) => {
+        nodeModel.annotations = [
+          { content: (data as UserInfo).name, style: { color: "white" } }
+        ];
+      }
   };
+  
 
   public layout: LayoutModel = {
     type:'OrganizationalChart'
   };
+
   
   public nodeDefaults(node: NodeModel): NodeModel {
     let codes: Object = {
@@ -196,12 +219,12 @@ export class AccHierarchyComponent {
       "college-admin": "#A52A2A",
       "lab-executive": "#228B22"
     };
-    node.width = 130;
-    node.height = 50;
+    node.width = 160;
+    node.height = 30;
     node.annotations = [
       { content: (node.data as UserInfo).username, style: { color: "lightgray", fontSize: 12 },  offset: { x: 0.5, y: 0.25 }},
       { content: (node.data as UserInfo).name, style: { color: "white" } },
-      { content: (node.data as UserInfo).role, style: { color: "lightgray", fontSize: 12 },  offset: { x: 0.5, y: 0.75 }}
+      { content: (node.data as UserInfo).role, style: { color: "white", fontSize: 15 },  offset: { x: 0.5, y: 0.5 },  constraints: AnnotationConstraints.ReadOnly,}
     ];
     ((node as NodeModel).style as ShapeStyleModel).fill = (codes as any)[(node.data as UserInfo).role] as string;
     return node;
@@ -213,7 +236,7 @@ export class AccHierarchyComponent {
     return connector;
   }
 
-  public tool: DiagramTools = DiagramTools.ZoomPan;
+  public tool: DiagramTools = DiagramTools.None;
 
   public drop(args: IDropEventArgs) {
     if(this.diagram){
@@ -233,5 +256,7 @@ export class AccHierarchyComponent {
   goBack(){
     this.router.navigate(['/drawer/accManagement']);
   }
+
+  
 
 }

@@ -177,5 +177,43 @@ export class LabSessionDetailsComponent{
           });
       }
 
+      openRemarksDialog(studentName: string, originalRemarks: string, attendanceID: string){
+        Swal.fire({
+            title: `Remarks for ${studentName}'s attendance`,
+            input: 'text',
+            inputPlaceholder: `${originalRemarks}`,
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            preConfirm: (value) => {
+              if (value.length > 1000) {
+                    Swal.showValidationMessage('!');
+                    return false;
+                }
+              else if (value.length == 0){
+                    Swal.showValidationMessage('Please enter a remark or select Cancel!');
+                    return false;
+              }
+                return value;
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const remarksPayload = {
+                attendanceID: Number(attendanceID),
+                newRemarks: result.value,
+              }
+              console.log(`Remarks entered for ${studentName}`, result.value);
+              this.attendanceService.updateRemarks(remarksPayload).subscribe({
+                next: (response) => {
+                    console.log(response);
+                },
+                error: (err) =>{
+                    console.error(err.error.message);
+                }
+              })
+
+              Swal.fire('Submitted!', `Remarks entered: ${result.value}`, 'success');
+            }
+          });
+      }
 
 }

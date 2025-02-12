@@ -10,12 +10,14 @@
     </head>
     <body>
         <div>
-          <div style="display: flex; position: relative; align-items: center; justify-content: center; width: 100%;">
+          <div style="display: flex; align-items: center; flex-direction: column;">
             <h2>Accounts Management</h2>
-            <button mat-raised-button (click)="navigateToHierarchy()"  style="position: absolute; right: 0;background-color: skyblue;"> 
+
+            <app-accHierarchy-page (nodeClicked)="handleNodeClick($event)"></app-accHierarchy-page>
+            <!--<button mat-raised-button (click)="navigateToHierarchy()"  style="position: absolute; right: 0;background-color: skyblue;"> 
               <span class="material-symbols-outlined">
                 family_history </span>
-              <b>Display Hierarchical View</b> </button>  
+              <b>Display Hierarchical View</b> </button>-->
           </div>            
             <div class="popup-box">
                 <div class="new_settings">

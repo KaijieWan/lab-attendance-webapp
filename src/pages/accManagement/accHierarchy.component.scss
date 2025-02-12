@@ -1,12 +1,13 @@
-body {
-    margin-left: 5%;
-}
+/*body {
+    margin-left: 20%;
+}*/
 
 .diagram-complex-hierarchical-tree .image-pattern-style {
     background-color: white;
     background-size: contain;
     background-repeat: no-repeat;
     height: 75px;
+    //width: 100%;
     width: calc((100% - 18px) / 3);
     cursor: pointer;
     border: 1px solid #D5D5D5;
@@ -15,6 +16,7 @@ body {
 }
 
 .diagram-complex-hierarchical-tree .row {
+    width: 100%;
     margin-left: 0px;
     margin-right: 0px;
 }
@@ -38,6 +40,7 @@ body {
 }
 
 .diagram-complex-hierarchical-tree .col-xs-6 {
+    width: 100%;
     padding-left: 0px;
     padding-right: 0px;
 }
@@ -96,4 +99,8 @@ body {
 
 .back:hover {
   background-color: #2980b9;
+}
+
+#diagram {
+  overflow: visible !important;
 }
