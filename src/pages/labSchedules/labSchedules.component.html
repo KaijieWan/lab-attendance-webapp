@@ -10,22 +10,60 @@
         <link rel="stylesheet" href="labSchedules.component.scss">
     </head>
     <body>
-        <h2 style="text-align: center; margin-bottom: 10px;">Lab Rooms</h2>
-        <h3 style="margin-bottom: -10px;">Hardware Labs</h3>
-        <ul class="links">
-            <li *ngFor="let labRoom of labs.hardware">
-                <div class="permissions-container">
-                  <a (click)="navigateToLabSchedule(labRoom.name)"><span class="title">{{ labRoom.name }}</span></a>
-    
-                </div>
-        </ul>
-        <h3 style="margin-bottom: -10px;">Software Labs</h3>
-        <ul class="links">
-            <li *ngFor="let labRoom of labs.software">
-                <div class="permissions-container">
-                  <a (click)="navigateToLabSchedule(labRoom.name)"><span class="title">{{ labRoom.name }}</span></a>
-    
-                </div>
-        </ul>
+        <div mat-dialog-title>
+            <div class="slider-container">
+              <button
+                [class.active]="currentView === 'courses'"
+                (click)="switchView('courses')">
+                Your Courses
+              </button>
+              <button
+                [class.active]="currentView === 'labRoom'"
+                (click)="switchView('labRoom')">
+                Lab Room View
+              </button>
+              <button
+                [class.active]="currentView === 'semester'"
+                (click)="switchView('semester')">
+                Semester View
+              </button>
+              <div class="slider" [class.courses]="currentView === 'courses'" [class.labRoom]="currentView === 'labRoom'" [class.semester]="currentView === 'semester'"></div>
+            </div>
+        </div>
+
+        <div *ngIf="currentView === 'courses'">
+            <div class="calendar-container">
+                <full-calendar [options]="calendarOptions"></full-calendar>
+            </div>
+        </div>
+
+        <div *ngIf="currentView === 'labRoom'">
+            <div class="labRoom-container">
+
+            </div>
+            <h2 style="text-align: center; margin-bottom: 10px;">Lab Rooms</h2>
+            <h3 style="text-align: center; margin-bottom: -10px;">Hardware Labs</h3>
+            <ul class="links">
+                <li *ngFor="let labRoom of labs.hardware">
+                    <div class="permissions-container">
+                    <a (click)="navigateToLabSchedule(labRoom.name)"><span class="title">{{ labRoom.name }}</span></a>
+        
+                    </div>
+            </ul>
+            <h3 style="text-align: center; margin-bottom: -10px;">Software Labs</h3>
+            <ul class="links">
+                <li *ngFor="let labRoom of labs.software">
+                    <div class="permissions-container">
+                    <a (click)="navigateToLabSchedule(labRoom.name)"><span class="title">{{ labRoom.name }}</span></a>        
+                    </div>
+            </ul>
+        </div>
+
+        <div *ngIf="currentView === 'semester'">
+            <div class="calendar-container">
+                <full-calendar [options]="calendarOptions"></full-calendar>
+            </div>
+        </div>
+            
     </body>
 </html>

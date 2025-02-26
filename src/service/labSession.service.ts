@@ -21,6 +21,10 @@ export interface MessageResponse {
       return this.http.post<MessageResponse>(`${this.labSessionUrl}/createNewLabSession`, labSession);
     }
 
+    getAllLabSessions() : Observable<any>{
+
+    }
+
     getDistinctModules(semester: string) : Observable<any>{
       return this.http.get<any>(`${this.labSessionUrl}/distinctModules?semester=${semester}`);
     }
@@ -28,7 +32,7 @@ export interface MessageResponse {
     getSpecificLabSessions(classGroupId: string, moduleCode: string, semesterId: string){
       return this.http.get<any>(`${this.labSessionUrl}/specificLabSessions?classGroupId=${classGroupId}&moduleCode=${moduleCode}&semesterId=${semesterId}`);
     }
-
+     
     getLabSessionsByLabAndRoomAndSemester(lab: string, room: string, semester: string) : Observable<any>{
       return this.http.get<any>(`${this.labSessionUrl}/getLabSessionsByLabAndRoomAndSemester?lab=${lab}&room=${room}&semester=${semester}`)
     }

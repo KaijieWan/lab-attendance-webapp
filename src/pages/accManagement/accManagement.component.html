@@ -73,6 +73,9 @@
                                 </div>                    
                             </div>
                           </th>
+                          <th>
+
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -81,6 +84,15 @@
                           <td>{{ user.name }}</td>
                           <td>{{ user.email }}</td>
                           <td>{{ user.role }}</td>
+
+                          <td>
+                            <div class="edit_button">
+                              <button mat-raised-button (click)="openUserDialog(user.username, user.role, user.modulesAssigned, user.id)">
+                                <span class="material-symbols-outlined">
+                                edit
+                                </span> </button> 
+                            </div>        
+                          </td>
                         </tr>
                       </tbody>
                     </table>

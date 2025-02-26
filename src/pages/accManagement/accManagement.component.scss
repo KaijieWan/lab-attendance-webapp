@@ -99,7 +99,7 @@ table {
   
 th, td {
     //border: 0px solid #ddd;
-    padding: 14px 40px;
+    padding: 8px 30px;
     text-align: left;
     border-bottom: 2px solid #3498db;
     //cursor: pointer;
@@ -242,7 +242,7 @@ th, td {
   }
 
   .searchContainer {
-    margin-bottom: -4%;
+    margin-bottom: -2%;
   }
 
   .searchBox {
@@ -255,4 +255,51 @@ th, td {
     //height: 100vh; /* Ensure it takes full viewport height */
     display: flex;
     flex-direction: column;
+  }
+
+  .edit_button button{
+    display: inline-flex;
+    background-color: #3498db;
+    color: #fff;
+    margin: 10px 5px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: #444 solid;
+
+    padding: 5px 1px;
+    height: auto;
+    width: 10px;
+  }
+
+  .edit_button button:hover {
+    background-color: #2980b9;
+}
+
+.swal-popup {
+    font-family: Arial, sans-serif;
+  }
+  
+  #module-list {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    gap: 8px; /* Add spacing between rows */
+  }
+  
+  .swal-checkbox-container {
+    display: flex;
+    align-items: center; /* Ensures checkbox and text are aligned */
+    gap: 10px; /* Space between checkbox and text */
+  }
+  
+  .module-checkbox {
+    transform: scale(1.2); /* Slightly increase checkbox size for visibility */
+    cursor: pointer;
+  }
+  
+  .swal-label {
+    font-size: 16px;
+    cursor: pointer;
   }

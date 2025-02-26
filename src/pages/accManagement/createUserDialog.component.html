@@ -32,6 +32,27 @@
                     <option *ngFor="let item of distinctRoles" [value]="item">{{ item }}</option>
                   </select>
                 </div>
+                
+                <ul class="links">
+                  <div style="display: flex; flex-direction: column;">
+                    <span class="title">Assign Modules:</span>
+                    <label class="container" style="color: red; margin-top: 10px; margin-bottom: -20px;">
+                      Check All Modules
+                      <input type="checkbox" (change)="checkAllBoxes($event)">
+                      <span class="checkmark"></span>
+                    </label>
+                  </div>
+                  
+                    <div class="permissions-container">                                            
+                      <label class="container" *ngFor="let module of modules">
+                        {{ module }}
+                        <input type="checkbox" (change)="onCheckboxChangeAssignModule($event, module)"
+                        [checked]="checkModule()">
+                        <span class="checkmark"></span>
+                      </label>     
+        
+                    </div>     
+                </ul> 
 
                 <!-- <label for="angularDropdown">Select an item:</label>
                       <select id="angularDropdown" [(ngModel)]="selectedItem" name="angularDropdown">

@@ -30,11 +30,13 @@ export interface MessageResponse {
 }
 
 export interface UserResponse {
+  modules: string[];
   id: number;
   username: string;
   name: string;
   email: string;
   role: string;
+  modulesAssigned: string;
 }
 
 export interface UpdatePassRequest {
@@ -47,14 +49,17 @@ export interface UpdateUserRequest {
   name: string;
   role: string;
   username: string;
+  modulesAssigned: string;
 }
 
 export interface UserDTO {
+  modules: string[];
   id: string;
   username: string;
   name: string;
   email: string;
   role: string;
+  modulesAssigned: string;
 }
 
 export interface PaginatedResponse {
@@ -71,6 +76,7 @@ export interface CreateUserRequest{
   email: string;
   role: string;
   password: string;
+  modulesAssigned: string;
 }
 
 @Injectable({

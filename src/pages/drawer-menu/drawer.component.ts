@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Injectable, ViewChild } from '@angular/core';
 import {FormGroup, FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 import { Router, RouterOutlet, RouterModule } from '@angular/router';
 import { UserService } from '../../service/user.service';
@@ -27,6 +27,9 @@ interface RolePermission{
   styleUrl: './drawer.component.scss',
 })
 
+@Injectable({
+  providedIn: 'root'
+})
 export class DrawerComponent {
   date = new Date();
   username: string = '';

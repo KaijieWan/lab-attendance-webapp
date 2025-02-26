@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { AfterViewInit, Component, Inject } from '@angular/core';
-import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl} from '@angular/forms';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormArray} from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../service/user.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -8,7 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { debounceTime, map, Observable, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
 import { ToastrService, ToastrModule } from 'ngx-toastr';
-
+import { ModuleService } from '../../service/module.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-createUserDialog-page',
@@ -25,6 +26,8 @@ export class CreateUserDialogComponent {
   errorMessage: string = '';
   distinctRoles: string[] = [];
   selectedRole: string = '';
+  modules: string[]= [];
+  assignAllModules: boolean = false;
 
   constructor(
       public dialogRef: MatDialogRef<CreateUserDialogComponent>,
@@ -32,12 +35,19 @@ export class CreateUserDialogComponent {
       private userService: UserService,
       private rolePermissionService: RolePermissionService,
       private toastr: ToastrService,
+      private moduleService: ModuleService
   ) {}
 
     ngOnInit(): void {
       this.rolePermissionService.getDistinctRoles().subscribe({
         next: (response) => {
           this.distinctRoles = response;
+        }
+      })
+
+      this.moduleService.getAllModules().subscribe({
+        next: (response) => {
+          this.modules = response.map((item: { moduleCode: any; }) => item.moduleCode);          
         }
       })
     }
@@ -60,6 +70,7 @@ export class CreateUserDialogComponent {
       newPassword: new FormControl('', [Validators.minLength(8), Validators.required],
       [this.passwordAsyncValidator.bind(this)] ),
       confirmPassword: new FormControl('', Validators.required),
+      modulesAssigned: new FormArray([])
     },
     { validators: this.matchPasswordsValidator });
   
@@ -96,6 +107,47 @@ export class CreateUserDialogComponent {
       }
     }
 
+    onCheckboxChangeAssignModule(event: any, module: string){
+      const modulesAssigned: FormArray = this.profileForm.get('modulesAssigned') as FormArray;
+    
+      if (event.target.checked) {
+        // Add item if checked
+        modulesAssigned.push(new FormControl(module));
+      } else {
+        // Remove item if unchecked
+        const index = modulesAssigned.controls.findIndex(x => x.value === module);
+        if (index > -1) {
+          modulesAssigned.removeAt(index);
+        }
+      }
+    }
+
+    checkAllBoxes(e: any){
+      const modulesAssigned: FormArray = this.profileForm.get('modulesAssigned') as FormArray;
+      if(e.target.checked){
+        this.assignAllModules = true;        
+        this.modules.forEach(module => {
+          modulesAssigned.push(new FormControl(module));
+        })        
+      }
+      else{
+        this.assignAllModules = false;
+        this.modules.forEach(module => {
+          const index = modulesAssigned.controls.findIndex(x => x.value === module);
+          if (index > -1) {
+            modulesAssigned.removeAt(index);
+          }
+        })  
+      }            
+    }
+
+    checkModule(){
+      if(this.assignAllModules){
+        return true;
+      }
+      return false;
+    }
+
     submitDetails(){
       console.log("submitDetails() called")
       this.submit = true;
@@ -104,14 +156,18 @@ export class CreateUserDialogComponent {
       const email = this.profileForm.value.email;
       const role = this.profileForm.value.role;
       const password = this.profileForm.value.confirmPassword;
+      const modules_assigned = this.profileForm.value.modulesAssigned ? this.profileForm.value.modulesAssigned.join(',') : 'na'
 
-      if(username && name && email && role && password){
+      console.log(modules_assigned);
+
+      if(username && name && email && role && password && modules_assigned){
         this.userService.createUser({
           username: username,
           name: name,
           email: email,
           role: role,
-          password: password
+          password: password, 
+          modulesAssigned: modules_assigned
         } ).subscribe({
           next: (response) => {
             console.log(response);

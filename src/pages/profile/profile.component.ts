@@ -174,7 +174,7 @@ export class ProfileComponent {
       console.log("Email & name & id check");
       if(email != this.original_email || name != this.original_name){
         console.log("Email & name similarity check");
-        this.userService.updateUser({email: email, name: name, username: this.username, role: this.role}, parseInt(id)).subscribe({
+        this.userService.updateUser({email: email, name: name, username: this.username, role: this.role, modulesAssigned: ""}, parseInt(id)).subscribe({
           next: (response) => {
             console.log(response);
             this.saving = false;

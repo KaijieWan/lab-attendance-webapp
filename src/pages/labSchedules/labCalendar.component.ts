@@ -1,4 +1,4 @@
-import {Component, ViewChild, AfterViewInit, OnInit, CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {Component, ViewChild, AfterViewInit, OnInit, CUSTOM_ELEMENTS_SCHEMA, Injectable, ChangeDetectorRef} from "@angular/core";
 import { LabSessionService } from '../../service/labSession.service';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { DatePipe, CommonModule } from '@angular/common';
@@ -58,12 +58,14 @@ export interface Lab {
   imports: [ReactiveFormsModule, RouterOutlet, DatePipe, CommonModule,
     FormsModule, FullCalendarModule],
 })
+
+@Injectable({
+  providedIn: 'root'
+})
 export class LabCalendarComponent {  
   labSessions: LabSession[] = [];
   lab: string = "";
   timePipe: any;
-
-  //labs!: labs;
 
   labs = {
     hardware: [
@@ -81,9 +83,21 @@ export class LabCalendarComponent {
   };
 
   constructor(private labSessionService: LabSessionService, private route: ActivatedRoute,
-    private refreshService: RefreshService,
+    private refreshService: RefreshService, private cdr: ChangeDetectorRef
   ){
     this.timePipe = new CustomTimePipe();
+
+    this.lab = this.route.snapshot.paramMap.get('lab')!;
+
+    if(this.labSessions.length == 0){
+      this.refreshService.refresh$.subscribe(() => {
+        const semester = sessionStorage.getItem('semesterID');
+        if(semester){
+          //this.refreshData(semester);
+          this.fetchAllRooms(this.lab, semester);
+        }
+      })  
+    }    
   }
 
   calendarOptions = {
@@ -94,12 +108,14 @@ export class LabCalendarComponent {
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay',
     },
-    slotMinTime: '08:00:00',  // Start time
-    slotMaxTime: '20:00:00',  // End time
+    slotMinTime: '08:30:00',  // Start time
+    slotMaxTime: '19:30:00',  // End time
     allDaySlot: false,
     stickyHeaderDates: true,
-    slotLabelInterval: '00:30:00',
+    slotLabelInterval: '01:00:00',
+    slotDuration: '00:30:00',
     eventMaxStack: 2,
+    hiddenDays: [0],
 
     //Time format: '2025-02-07T10:00:00'
     
@@ -111,13 +127,10 @@ export class LabCalendarComponent {
       return {
         html: `<b>${info.event.title}: </b> <br>
         ${info.event.extendedProps.classGroup}<br>
-               📍 ${info.event.extendedProps.location}<br>
-               ${this.timePipe.transform(info.event.extendedProps.startTime)}-${this.timePipe.transform(info.event.extendedProps.endTime)}<br>
-               `
+               📍 ${info.event.extendedProps.location}<br>`
       };
     }
-  };
-
+  };  
 
   ngOnInit(): void {
     //const resourceMap = [{ resourceId: room, resourceTitle: "Room " + room }];
@@ -139,7 +152,7 @@ export class LabCalendarComponent {
     //const [date, setDate] = useState(min([new Date(), maxDate.toDate()]));
     //const [view, setView] = useState(Views.WORK_WEEK);    
 
-    this.lab = this.route.snapshot.paramMap.get('lab')!;
+    /*this.lab = this.route.snapshot.paramMap.get('lab')!;
 
     if(this.labSessions.length == 0){
       this.refreshService.refresh$.subscribe(() => {
@@ -149,7 +162,7 @@ export class LabCalendarComponent {
           this.fetchAllRooms(this.lab, semester);
         }
       })  
-    }    
+    }*/
   }
 
   fetchAllRooms(labName: string, semester: string){
@@ -168,8 +181,12 @@ export class LabCalendarComponent {
       })      
     }
 
+    setTimeout(() => this.updateCalendarEvents(), 500);
+  }
+
+  updateCalendarEvents() {
     this.calendarOptions = {
-      ...this.calendarOptions,
+      ...this.calendarOptions, 
       events: this.labSessions.map(labSession => ({
         id: labSession.labSessionID,
         title: labSession.classGroupID.moduleCode,
@@ -184,10 +201,12 @@ export class LabCalendarComponent {
         }
       })) as EventInput
     };
+    this.cdr.detectChanges();
   }
 
   refreshData(semester: string, room: string){
     this.labSessionService.getLabSessionsByLabAndRoomAndSemester(this.lab, room, semester).subscribe((response: [LabSession, number][]) => {
+      //console.log(response);
       this.labSessions = this.labSessions.concat(response.map((item => item[0])));
     });
   }    

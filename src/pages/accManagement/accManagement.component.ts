@@ -13,6 +13,8 @@ import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from '../../lib/auth.interceptor';
 import { AccHierarchyComponent } from './accHierarchy.component';
+import Swal from 'sweetalert2';
+import { ModuleService } from '../../service/module.service';
 
 
 interface RolePermission {
@@ -42,13 +44,16 @@ export class AccManagementComponent {
   filtererdUsersBasedOnRole: UserDTO[] = [];
   roleFiltered: boolean = false;
   roles: string[] = [];
+  distinctRoles: string[] = [];
   totalPages = 0;
   currentPage = 0;
   pageSize = 15;
   searchTerm$ = new Subject<string>();
+  modules: string[] = [];
 
   constructor(private router: Router, private userService : UserService, private dialog: MatDialog,
-    private rolePermissionService: RolePermissionService, private toastr: ToastrService
+    private rolePermissionService: RolePermissionService, private toastr: ToastrService,
+    private moduleService: ModuleService
   ) {}
   
   ngOnInit() {
@@ -97,6 +102,20 @@ export class AccManagementComponent {
           : [...this.users];
         }        
       });
+
+      this.rolePermissionService.getDistinctRoles().subscribe({
+        next: (response) => {
+          this.distinctRoles = response;
+        }
+      })
+
+      this.moduleService.getAllModules().subscribe({
+        next: (response) => {
+          this.modules = response.map((item: { moduleCode: any; }) => item.moduleCode);
+          this.modules.sort((b, a) => b.localeCompare(a, undefined, { numeric: true }));
+          console.log("Modules: " + this.modules);
+        }
+      })
   }
 
   handleOutsideClick = (event: MouseEvent):void => {
@@ -207,7 +226,7 @@ export class AccManagementComponent {
           }
           else{
             const dialogRef = this.dialog.open(CreateUserDialogComponent, {
-              width: '700px',
+              width: '1000px',
               panelClass: 'custom-dialog-container',
               //data: { name: 'Angular User' }, // Optional data to pass to dialog
             });
@@ -263,6 +282,122 @@ export class AccManagementComponent {
         error: (err) => console.log("Error in permission check", err)
       });      
     }        
+  }
+
+  openUserDialog(username: string, currentRole: string, modulesAssigned: string, id: string){
+    Swal.fire({
+      title: `Edit ${username}'s Details`,
+      html: `
+        <label for="role">Role:</label>
+        <select id="role" class="swal2-input">
+          <option value="" disabled>Select available role</option>
+        </select>
+        <br><br>
+        <label for="module-list"><b>Assigned Modules:</b></label>
+        <br>
+        <div id="module-list">
+          ${this.modules
+            .map(
+              (module) => `
+                <div class="swal-checkbox-container">
+                  <input type="checkbox" value="${module}" class="module-checkbox"
+                  ${modulesAssigned.includes(module) ? 'checked' : ''}>
+                  <label class="swal-label">${module}</label>
+                </div>
+              `
+            )
+            .join('')}
+        </div>
+      `,
+      customClass: {
+        popup: 'swal-popup',
+      },
+      didOpen: () => {
+        // Get the select element
+        const selectElement = document.getElementById("role") as HTMLSelectElement;
+
+        // Populate dropdown with distinctRoles array
+        this.distinctRoles.forEach((role) => {
+          let option = document.createElement("option");
+          option.value = role;
+          option.textContent = role;
+          selectElement.appendChild(option);
+        });
+
+        // Set the selected value to currentRole
+        if (currentRole) {
+          selectElement.value = currentRole;
+        }
+
+        /*const selectedModules = Array.from(document.querySelectorAll('.module-checkbox:checked'))
+          .map((checkbox) => (checkbox as HTMLInputElement).value);*/
+
+        //return selectedModules;
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Update',
+      preConfirm: () => {
+        const selectedRole = (document.getElementById("role") as HTMLSelectElement).value;
+
+        const selectedModules = Array.from(document.querySelectorAll('.module-checkbox:checked'))
+          .map((checkbox) => (checkbox as HTMLInputElement).value)
+          .join(',');
+
+        return { role: selectedRole, modules: selectedModules };
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Final Confirmation",
+          text: "Confirm Edit?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Confirm!",
+          cancelButtonText: "Cancel"
+        }).then((finalResult) => {
+          if(finalResult.isConfirmed){
+            let updatedModules = result.value?.modules;
+            console.log(updatedModules);
+
+            let updatedRole = "";
+
+            if(result.value?.role){
+              updatedRole = result.value?.role
+            }            
+
+            if(!updatedModules){
+              updatedModules = "na";
+            }
+            
+            console.log('User updated:', updatedModules, result.value?.role);
+
+            this.userService.updateUser({email: "", username: "", name: "", role: updatedRole, modulesAssigned: updatedModules}, parseInt(id)).subscribe({
+              next: (response) => {
+                console.log(response);
+                switch(response.status) {
+                  case "SUCCESS" : {
+                    console.log('Update successful:', response);
+                    Swal.fire('Updated!', `Role: ${updatedRole}; Modules Assigned: ${updatedModules}`, 'success');
+                    break;
+                  }
+                  default: {
+                    console.log('Error Message:', response);
+                    Swal.fire("Error!", "Something went wrong.", "error");
+                    break;
+                  }
+                }
+              },
+              error: (err) => {
+                console.error('Update failed:', err.error.message);
+                Swal.fire("Error!", "Something went wrong.", "error");
+              },              
+            })
+
+            
+          }})
+        
+      }
+    });
   }
 
   navigateToHierarchy(){

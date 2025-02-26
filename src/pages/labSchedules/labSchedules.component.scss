@@ -1,10 +1,10 @@
 body {
-    margin-left: 100px;
+    margin-left: 10%;
     //margin: 0;
     //height: 100vh; /* Ensure the body spans the full height of the viewport */
     display: flex; /* Use Flexbox to align items */
-    justify-content: left; /* Horizontally center content */
-    align-items: center; /* Vertically center content */
+    //justify-content: left; /* Horizontally center content */
+    //align-items: center; /* Vertically center content */
     flex-direction: column;
 }
 
@@ -25,8 +25,9 @@ body {
     flex-wrap: wrap;
     gap: 40px;
     padding: 0;
-    justify-content: left;
+    justify-content: center;
     list-style-type: none;
+    align-items: center;
 }
 
 .links li {
@@ -57,4 +58,90 @@ body {
 
   .permissions-container .title:hover {
     background-color: #007bff;
+  }
+
+  .slider-container {
+    display: flex;
+    position: relative;
+    justify-content: space-around;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+  }
+
+  .slider-container button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px 16px;
+    position: relative;
+  }
+
+  .slider-container button.active {
+    font-weight: bold;
+    color: blueviolet;
+  }
+
+  .slider {
+    position: absolute;
+    bottom: 0;
+    height: 3px;
+    width: 33%;
+    background: #1976d2;
+    transition: transform 0.3s ease;
+  }
+  
+  .slider.courses {
+    transform: translateX(-100%);
+  }
+  
+  .slider.labRoom {
+    transform: translateX(-4%);
+  }
+  
+  .slider.semester {
+    transform: translateX(100%);
+  }
+
+  .calendar-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .labRoom-container {
+    display: flex;
+    align-items: center;
+  }
+
+
+full-calendar {
+    margin-top: 24px;
+    width: 100%;
+    height: 700px;
+}
+
+  ::ng-deep .fc-timegrid-slot {
+    height: 30px !important; 
+  }
+
+  ::ng-deep .tippy-box {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+    background: #7bb6f6;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .tooltip-btn {
+    background: white;
+    color: black;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+  }
+  .tooltip-btn:hover {
+    background: lightgray;
   }
