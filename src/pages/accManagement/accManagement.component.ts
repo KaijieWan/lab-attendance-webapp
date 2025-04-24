@@ -16,7 +16,6 @@ import { AccHierarchyComponent } from './accHierarchy.component';
 import Swal from 'sweetalert2';
 import { ModuleService } from '../../service/module.service';
 
-
 interface RolePermission {
   permissionType: string,
   actions: string[];
@@ -215,18 +214,18 @@ export class AccManagementComponent {
       this.rolePermissionService.getRolePermissions(userDetails.user.role.toString()).subscribe({
         next: (response: RolePermission[]) => {
           const permission = response.find(
-            (item) => item.permissionType === 'create_new_user'
+            (item) => item.permissionType === 'accounts_management_page'
           );
           console.log(permission);
           
-          if (!permission || !permission.actions.includes('allow')) {
+          if (!permission || !permission.actions.includes('create')) {
             //Perhaps use a toastr to display denied message
             console.log("Permission for allow creating of user not found")
             this.toastr.error("Access To Creating New User Denied", "ERROR");
           }
           else{
             const dialogRef = this.dialog.open(CreateUserDialogComponent, {
-              width: '1000px',
+              width: '700px',
               panelClass: 'custom-dialog-container',
               //data: { name: 'Angular User' }, // Optional data to pass to dialog
             });
@@ -261,14 +260,14 @@ export class AccManagementComponent {
           );
           console.log(permission);
           
-          if (!permission || !permission.actions.includes('allow')) {
+          if (!permission || permission.actions.includes('do_not_allow')) {
             //Perhaps use a toastr to display denied message
             console.log("Permission for allow creating of user not found")
             this.toastr.error("Access To Role Management Denied", "ERROR");
           }
-          else{
+          else if(permission.actions.includes('allow')){
             const dialogRef = this.dialog.open(NewRoleDialogComponent, {
-              width: '1000px',
+              width: '700px',
               panelClass: 'custom-dialog-container',
               //data: { name: 'Angular User' }, // Optional data to pass to dialog
             });
@@ -281,10 +280,43 @@ export class AccManagementComponent {
         },
         error: (err) => console.log("Error in permission check", err)
       });      
-    }        
+    }
   }
 
   openUserDialog(username: string, currentRole: string, modulesAssigned: string, id: string){
+    console.log("openCreateUserDialog");
+    const sessionData = sessionStorage.getItem('userDetails');
+    if (!sessionData) {
+      //Perhaps use a toastr to display denied message
+      console.log("openUserDialog: sessionData not found");
+      this.toastr.error("Access To Updating User Denied");
+    }
+    else{
+      console.log("openCreateUserDialog: sessionData found");
+      const userDetails = JSON.parse(sessionData);
+      console.log(userDetails.user.role);
+      this.rolePermissionService.getRolePermissions(userDetails.user.role.toString()).subscribe({
+        next: (response: RolePermission[]) => {
+          const permission = response.find(
+            (item) => item.permissionType === 'accounts_management_page'
+          );
+          console.log(permission);
+          
+          if (!permission || !permission.actions.includes('update')) {
+            console.log("Permission for updating of user not found")
+            this.toastr.error("Access To Updating User Denied", "ERROR");
+          }
+          else{
+            this.updateUserDialog(username, currentRole, modulesAssigned, id);
+          }
+          console.log("Permission check completed")
+        },
+        error: (err) => console.log("Error in permission check", err)
+      });      
+    }
+  }
+
+  updateUserDialog(username: string, currentRole: string, modulesAssigned: string, id: string){
     Swal.fire({
       title: `Edit ${username}'s Details`,
       html: `

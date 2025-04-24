@@ -58,3 +58,21 @@ body {
   .permissions-container .title:hover {
     background-color: #007bff;
   }
+
+  button{
+    display: inline-flex;
+    background-color: #3498db;
+    color: #fff;
+    margin: 0px 5px;
+    border: none;
+    padding: 10px 12px; 
+    gap: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: #444 solid;
+}
+
+button:hover {
+    background-color: #2980b9;
+}

@@ -22,7 +22,7 @@ export interface MessageResponse {
     }
 
     getAllLabSessions() : Observable<any>{
-
+      return this.http.get<any>(`${this.labSessionUrl}`);
     }
 
     getDistinctModules(semester: string) : Observable<any>{
@@ -35,6 +35,10 @@ export interface MessageResponse {
      
     getLabSessionsByLabAndRoomAndSemester(lab: string, room: string, semester: string) : Observable<any>{
       return this.http.get<any>(`${this.labSessionUrl}/getLabSessionsByLabAndRoomAndSemester?lab=${lab}&room=${room}&semester=${semester}`)
+    }
+
+    deleteLabSession(labSessionID: string) : Observable<MessageResponse>{
+      return this.http.delete<any>(`${this.labSessionUrl}/deleteLabSession?labSessionID=${labSessionID}`);      
     }
 
   }

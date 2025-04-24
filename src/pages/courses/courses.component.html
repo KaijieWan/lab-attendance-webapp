@@ -11,8 +11,19 @@
     </head>
     <body>
       <h2 style="text-align: center; margin-bottom: 10px;">Courses</h2>
+      <div style="display: flex; flex-direction: row;">
+        <button mat-raised-button (click)="openAddNewModules()"> 
+          <span class="material-symbols-outlined">
+            school </span>
+          Add New Module </button> 
+        <button mat-raised-button (click)="openCreateLabSession()" *ngIf="semesterCourses.length>0"> 
+          <span class="material-symbols-outlined">
+            experiment </span>
+          Create New Lab Session </button>  
+      </div>
+      
         <ul class="links">
-            <li *ngFor="let course of semesterCourses">
+            <li *ngFor="let course of semesterCourses">                
                 <div class="permissions-container">
                   <a (click)="navigateToLabGroups(course)"><span class="title">{{ course }}</span></a>
     

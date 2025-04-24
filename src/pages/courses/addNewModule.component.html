@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Responsive Sidebar Menu</title>
+        <!-- Linking Google Font link for icons-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link rel="stylesheet" href="addNewModule.component.scss">
+    </head>
+    <body>
+        <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"  *ngIf="courseId"><b>Create New Lab Session for {{courseId}}</b></h1>
+        <div mat-dialog-content style="width: 100%;">
+          <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper style="width: 100%;">          
+            <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
+              {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
+            </ng-template>
+            <!-- Lab Session Details -->
+            <form [formGroup]="newModuleForm" class="form">
+              <mat-step [label]="'Semester'" [stepControl]="newModuleForm.get('semester')!">
+                  <h3>Select Availabe Semester:</h3>  
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="semester">
+                      <mat-option *ngFor="let sem of semesters" (click)="changeLab(sem.semester_ID)" [value]="sem.semester_ID">{{ sem.semester_ID }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+  
+                <div>
+                  <button mat-button matStepperNext [disabled]="newModuleForm.get('semester')!.invalid">Next</button>
+                </div>
+              </mat-step>
+
+              <mat-step [label]="'Upload Semester Lab Schedule'" [stepControl]="newModuleForm.get('schedule')!">
+                <h3>Drag and Drop Lab Schedule (needed for mapping of lab rooms to lab sessions):</h3>  
+                  <div
+                      class="dropzone"
+                      [class.dragover]="isDragOver"
+                      (dragover)="onDragOver($event)"
+                      (dragleave)="onDragLeave($event)"
+                      (drop)="onDropLab($event)"
+                    >
+                      <p>Drag and drop lab schedule here</p>
+                      <input type="file" multiple hidden (change)="uploadLabFile($event)" #fileInput/>
+                      <button type="button" (click)="fileInput.click()">Browse</button>
+                  </div>
+
+                  <div *ngIf="droppedLabFile.length > 0">
+                    <h4>Dropped Files:</h4>
+                    <ul>
+                      <li *ngFor="let file of droppedLabFile">{{ file.name }}</li>
+                    </ul>
+                  </div>
+                <div>
+                  <button mat-button matStepperNext [disabled]="droppedLabFile.length==0">Next</button>
+                </div>
+            </mat-step>
+              
+              <mat-step [label]="'Add Module Files'" [stepControl]="newModuleForm.get('modules')!">
+                <h3>Drag and Drop Module Files:</h3>  
+                  <div
+                      class="dropzone"
+                      [class.dragover]="isDragOver"
+                      (dragover)="onDragOver($event)"
+                      (dragleave)="onDragLeave($event)"
+                      (drop)="onDropModule($event)"
+                    >
+                      <p>Drag and drop files here</p>
+                      <input type="file" multiple hidden (change)="uploadStudentFiles($event)" #fileInput/>
+                      <button type="button" (click)="fileInput.click()">Browse</button>
+                  </div>
+
+                  <!--<mat-error *ngIf="newModuleForm.get('modules')?.invalid && newModuleForm.get('modules')?.touched">
+                    Please upload at least one file.
+                  </mat-error>-->
+
+                  <div *ngIf="droppedFiles.length > 0">
+                    <h4>Dropped Files:</h4>
+                    <ul>
+                      <li *ngFor="let file of droppedFiles">{{ file.name }}</li>
+                    </ul>
+                  </div>
+                <div>
+                  <button mat-button matStepperNext [disabled]="droppedFiles.length==0">Next</button>
+                </div>
+            </mat-step>
+
+            </form>
+                          
+            <!-- Submission -->
+            <mat-step [label]="'Submission'">           
+              <h3>Confirmation</h3>
+              <p>Review the details before submitting.</p>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button (click)="newModuleForm.valid && createSemester()" [disabled]="!newModuleForm.valid">
+                <span *ngIf="!submit">Create New Lab Session</span>
+                <span *ngIf="submit">
+                Creating...</span>
+              </button>              
+            </mat-step>
+          </mat-horizontal-stepper>         
+
+        </div>
+    </body>
+</html>

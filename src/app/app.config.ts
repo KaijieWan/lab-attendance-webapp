@@ -12,6 +12,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
 import { MatNativeDateModule } from '@angular/material/core';
 import { AuthInterceptor } from '../lib/auth.interceptor';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 
 /*
 // Define MSAL instance
@@ -43,24 +44,7 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
       ['https://graph.microsoft.com/v1.0/me', ['user.read']]
     ])
   };
-}
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    { provide: MSAL_INSTANCE, useFactory: MSALInstanceFactory },
-    { provide: MSAL_GUARD_CONFIG, useFactory: MSALGuardConfigFactory },
-    { provide: MSAL_INTERCEPTOR_CONFIG, useFactory: MSALInterceptorConfigFactory },
-    MsalService,
-    MsalGuard,
-    MsalBroadcastService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: MsalInterceptor,
-      multi: true
-    }
-  ]*/
+}*/
 
     export const authGuard: CanActivateFn = () => {
       const token = localStorage.getItem('authToken');
@@ -81,5 +65,9 @@ export const appConfig: ApplicationConfig = {
           useClass: AuthInterceptor,
           multi: true // Allow multiple interceptors
         },
+        {
+          provide: STEPPER_GLOBAL_OPTIONS,
+          useValue: { displayDefaultIndicatorType: true }
+        }
       ],
     };    

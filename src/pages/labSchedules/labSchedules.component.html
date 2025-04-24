@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="labSchedules.component.scss">
     </head>
     <body>
-        <div mat-dialog-title>
+        <!--<div mat-dialog-title>
             <div class="slider-container">
               <button
                 [class.active]="currentView === 'courses'"
@@ -63,7 +63,34 @@
             <div class="calendar-container">
                 <full-calendar [options]="calendarOptions"></full-calendar>
             </div>
+        </div>-->        
+        <div class="filter-container">
+              <span class="material-symbols-outlined" style="margin-bottom: 24px;">
+                tune
+              </span>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Filter Labs" [(ngModel)]="filteredLabs" multiple>
+                  <mat-option *ngFor="let lab of allLabs" (click)="filter()" [value]="lab">
+                    {{ lab }}
+                  </mat-option>                                    
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Filter Modules" [(ngModel)]="filteredModules" multiple>
+                  <mat-option *ngFor="let module of allSemesterModules" (click)="filter()" [value]="module"
+                  [disabled]="isDisabled(module)">
+                    {{ module }}
+                  </mat-option>
+                  <mat-option id="personalModules" [value]="'Your Modules'" (click)="filter()"
+                    [disabled]="isDisabled('Your Modules')">
+                    Your Modules
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
         </div>
-            
+        
+        <div class="calendar-container">
+            <full-calendar [options]="calendarOptions"></full-calendar>
+        </div>
     </body>
 </html>

@@ -11,6 +11,10 @@
     </head>
     <body>
         <h2 style="text-align: center; margin-bottom: 10px;" *ngIf="courseId">Lab Groups ({{courseId}})</h2>
+        <button mat-raised-button (click)="openCreateLabSession()"> 
+            <span class="material-symbols-outlined">
+              experiment </span>
+            Create New Lab Session </button>  
         <ul class="links">
             <li *ngFor="let classGroup of classGroups">
                 <div class="permissions-container">

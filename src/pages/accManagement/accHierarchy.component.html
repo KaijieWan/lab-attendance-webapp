@@ -37,7 +37,7 @@
 
         <div *ngIf="currentView === 'roles'">
             <ejs-diagram id="diagram" width="100%" height="480px" [layout]='layout' [dataSourceSettings]='dataSourceSettings' [getNodeDefaults]='nodeDefaults' [getConnectorDefaults]='connectorDefaults'
-            (click)="click($event)">
+            (click)="click($event)" [snapSettings]="snapSettings" [scrollSettings]="scrollSettings" [tool]="tool">
             </ejs-diagram>
         </div>
         

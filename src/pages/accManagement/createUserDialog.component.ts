@@ -1,26 +1,43 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewInit, Component, Inject } from '@angular/core';
-import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormArray} from '@angular/forms';
+import { AfterViewInit, Component, Inject, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormArray, FormsModule, FormBuilder} from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../service/user.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatExpansionPanel } from '@angular/material/expansion';
+import {MatListModule} from '@angular/material/list'
 import { debounceTime, map, Observable, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
 import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { ModuleService } from '../../service/module.service';
 import Swal from 'sweetalert2';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-createUserDialog-page',
   standalone: true,
   templateUrl: './createUserDialog.component.html',
 
-  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, MatDialogModule, MatButtonModule, CommonModule],
+  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, MatDialogModule, MatButtonModule, CommonModule,
+    MatExpansionModule, MatExpansionPanel, MatListModule, MatListModule, MatRadioModule, MatCheckboxModule,
+    MatStepperModule, MatInputModule, MatButtonModule, MatFormFieldModule, FormsModule,
+    MatSelectModule, MatOptionModule
+  ],
   styleUrl: './createUserDialog.component.scss'
 })
 
 export class CreateUserDialogComponent {
+  @ViewChildren(MatExpansionPanel) dropdownPanels!: QueryList<MatExpansionPanel>;
+
+  profileForm: FormGroup;
   passwordStrength: string = '';
   submit: boolean = false;
   errorMessage: string = '';
@@ -35,8 +52,25 @@ export class CreateUserDialogComponent {
       private userService: UserService,
       private rolePermissionService: RolePermissionService,
       private toastr: ToastrService,
-      private moduleService: ModuleService
-  ) {}
+      private moduleService: ModuleService,
+      private fb: FormBuilder,
+  ) {
+    this.profileForm = new FormGroup({    
+      username: new FormControl('', [Validators.minLength(3), Validators.required]),
+      name: new FormControl('', [Validators.minLength(5), Validators.required]),
+      email: new FormControl('',[Validators.email, Validators.required]),
+      role: new FormControl('', Validators.required),
+      newPassword: new FormControl('', [Validators.minLength(8), Validators.required],
+      [this.passwordAsyncValidator.bind(this)] ),
+      confirmPassword: new FormControl('', Validators.required),
+      modulesAssigned: new FormArray([])
+    },
+    { validators: this.matchPasswordsValidator });
+  }
+
+    ngAfterViewInit(){
+      this.dropdownPanels.toArray();
+    }
 
     ngOnInit(): void {
       this.rolePermissionService.getDistinctRoles().subscribe({
@@ -62,17 +96,7 @@ export class CreateUserDialogComponent {
       return newPassword === confirmPassword ? null : { mismatch: true };
     };
 
-    profileForm = new FormGroup({
-      username: new FormControl('', [Validators.minLength(3), Validators.required]),
-      name: new FormControl('', [Validators.minLength(5), Validators.required]),
-      email: new FormControl('',[Validators.email, Validators.required]),
-      role: new FormControl('', Validators.required),
-      newPassword: new FormControl('', [Validators.minLength(8), Validators.required],
-      [this.passwordAsyncValidator.bind(this)] ),
-      confirmPassword: new FormControl('', Validators.required),
-      modulesAssigned: new FormArray([])
-    },
-    { validators: this.matchPasswordsValidator });
+    
   
     passwordAsyncValidator(control: any): Observable<any> {
       const value = control.value || '';
@@ -107,10 +131,18 @@ export class CreateUserDialogComponent {
       }
     }
 
+    onPanelOpened(openedPanel: MatExpansionPanel){
+      this.dropdownPanels.forEach((item) => {
+        if(openedPanel!==item){
+          item.close();
+        }
+      })
+    }
+
     onCheckboxChangeAssignModule(event: any, module: string){
       const modulesAssigned: FormArray = this.profileForm.get('modulesAssigned') as FormArray;
     
-      if (event.target.checked) {
+      if (event.checked) {
         // Add item if checked
         modulesAssigned.push(new FormControl(module));
       } else {
@@ -124,7 +156,7 @@ export class CreateUserDialogComponent {
 
     checkAllBoxes(e: any){
       const modulesAssigned: FormArray = this.profileForm.get('modulesAssigned') as FormArray;
-      if(e.target.checked){
+      if(e.checked){
         this.assignAllModules = true;        
         this.modules.forEach(module => {
           modulesAssigned.push(new FormControl(module));
@@ -150,6 +182,7 @@ export class CreateUserDialogComponent {
 
     submitDetails(){
       console.log("submitDetails() called")
+      console.log(this.profileForm.value);
       this.submit = true;
       const username = this.profileForm.value.username;
       const name = this.profileForm.value.name;
@@ -175,7 +208,7 @@ export class CreateUserDialogComponent {
             switch(response.status) {
               case "SUCCESS" : {
                 console.log('Creation of new user successful:', response);
-                this.toastr.info("Created New User!", "SUCCESS");
+                this.toastr.success("Created New User!", "SUCCESS");
                 this.dialogRef.close();
                 break;
               }

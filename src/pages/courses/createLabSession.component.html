@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Responsive Sidebar Menu</title>
+        <!-- Linking Google Font link for icons-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link rel="stylesheet" href="createLabSession.component.scss">
+    </head>
+    <body>
+        <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"  *ngIf="courseId"><b>Create New Lab Session for {{courseId}}</b></h1>
+        <div mat-dialog-content style="width: 100%;">
+          <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper style="width: 100%;">          
+            <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
+              {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
+            </ng-template>
+            <!-- Lab Session Details -->
+            <form [formGroup]="newLabSessionForm" class="form">
+              <mat-step [label]="'Lab Details'" [stepControl]="newLabSessionForm.get('labRoom')!">
+                  <h3>Lab:</h3>  
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="labName">
+                      <mat-option *ngFor="let lab of displayLabNames" (click)="changeLab(lab)" [value]="lab">{{ lab }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <h3>Lab Room:</h3>  
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="labRoom">
+                      <mat-option *ngFor="let rooms of displayLabRoomNumbers" [value]="rooms">{{ rooms }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+  
+                <div>
+                  <button mat-button matStepperNext [disabled]="newLabSessionForm.get('labRoom')!.invalid">Next</button>
+                </div>
+              </mat-step>
+
+              <mat-step [label]="'Date & Timings'" [stepControl]="newLabSessionForm.get('end_time')!">
+                <h3>Date:</h3>  
+                <mat-form-field appearance="outline">
+                  <mat-label>Choose a date</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="date"/>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+                <h3>Start Time:</h3>  
+                <mat-form-field appearance="outline">
+                  <input matInput type="time" formControlName="start_time" required>
+                </mat-form-field>
+                <h3>End Time:</h3>  
+                <mat-form-field appearance="outline">
+                  <input matInput type="time" formControlName="end_time" required>
+                </mat-form-field>
+
+              <div>
+                <button mat-button matStepperNext [disabled]="newLabSessionForm.get('end_time')!.invalid">Next</button>
+              </div>
+            </mat-step>
+
+            <!-- Module -->
+            <mat-step [label]="'Module'" [stepControl]="newLabSessionForm.get('module')!">
+              <h3>Select available Module:</h3>  
+              <mat-form-field appearance="outline">
+                <mat-select formControlName="module">
+                    <mat-option *ngFor="let course of semesterCourses" [value]="course">{{ course }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div>
+                <button mat-button matStepperNext [disabled]="newLabSessionForm.get('module')!.invalid">Next</button>
+              </div>
+            </mat-step> 
+              
+              <!-- Class Group -->
+              <mat-step [label]="'Class Group'" [stepControl]="newLabSessionForm.get('classGroup')!">
+                <h3>Select available Class Group:</h3>  
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="classGroup">
+                      <mat-option *ngFor="let classGroup of classGroups" [value]="classGroup.classGroupId.classGroupID">{{ classGroup.classGroupId.classGroupID }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+  
+                <div>
+                  <button mat-button matStepperNext [disabled]="newLabSessionForm.get('classGroup')!.invalid">Next</button>
+                </div>
+              </mat-step>                                                   
+
+            </form>
+                          
+            <!-- Submission -->
+            <mat-step [label]="'Submission'">           
+              <h3>Confirmation</h3>
+              <p>Review the details before submitting.</p>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button (click)="newLabSessionForm.valid && submitDetails()" [disabled]="!newLabSessionForm.valid">
+                <span *ngIf="!submit">Create New Lab Session</span>
+                <span *ngIf="submit">
+                Creating...</span>
+              </button>              
+            </mat-step>
+          </mat-horizontal-stepper>         
+
+        </div>
+    </body>
+</html>

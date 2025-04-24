@@ -20,6 +20,7 @@ import { StudentService } from '../../service/studentService';
 import { LabSessionService } from '../../service/labSession.service';
 import { AttendanceService } from '../../service/attendance.service';
 import { SemesterService } from '../../service/semester.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-newRoleDialog-page',
@@ -131,7 +132,7 @@ export class NewSemDialogComponent {
         this.currentView = view;
     }
 
-    uploadStudentFiles(event: any) {
+    /*uploadStudentFiles(event: any) {
       const files: FileList = event.target.files;
       this.selectedFiles = files;
 
@@ -141,28 +142,38 @@ export class NewSemDialogComponent {
         const files: FileList = input.files;
   
         // Append new files to the list (avoiding duplicates)
-        Array.from(files).forEach((file) => {
+        Array.from(files).forEach((file) => {          
           if (!this.displayFiles.some(f => f.name === file.name && f.size === file.size)) {
             this.displayFiles.push(file);
           }
         });
       }
-    }
+    }*/
 
-    /*handleFileSelection(event: Event): void {
+    uploadStudentFiles(event: any) {
       const input = event.target as HTMLInputElement;
-  
+    
       if (input?.files) {
-        const files: FileList = input.files;
-  
-        // Append new files to the list (avoiding duplicates)
-        Array.from(files).forEach((file) => {
-          if (!this.selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
-            this.selectedFiles.push(file);
+        //this.selectedFiles = input.files;
+        const files = Array.from(input.files);        
+        Array.from(input.files).forEach((file) => {
+          if (!this.displayFiles.some(f => f.name === file.name && f.size === file.size)) {
+            this.displayFiles.push(file);
           }
         });
+
+        const dataTransfer = new DataTransfer();
+  
+        // Add previously selected files (if any)
+        if (this.selectedFiles) {
+          Array.from(this.selectedFiles).forEach(file => dataTransfer.items.add(file));
+        }
+        // Add new dropped files
+        files.forEach(file => dataTransfer.items.add(file));
+        this.selectedFiles = dataTransfer.files;
+        console.log("Student files uploaded:", this.selectedFiles);
       }
-    }*/
+    }
 
     uploadLabFile(event: any){
       const files: FileList = event.target.files;
@@ -180,6 +191,8 @@ export class NewSemDialogComponent {
       let courseCode = "";
   
       lines.forEach((line: any) => {
+        //console.log("Raw line: ", line);
+        //console.log("Raw line chars: ", [...line].map(c => c.charCodeAt(0)));
           if (line.startsWith("Course:")) {
               courseCode = line.split(" ")[1];
           } else if (line.startsWith("Class Group:")) {
@@ -195,16 +208,40 @@ export class NewSemDialogComponent {
               currentClass.dayOfWeek = day;
               currentClass.startTime = convertTime(startTime);
               currentClass.endTime = convertTime(endTime);
-  
-              currentClass.weeks = line
-                  .match(/Wk([\d,]+)/)[1]
-                  .split(",")
-                  .map(Number);
+
+              /*currentClass.weeks = line
+                .match(/Wk([\d,]+)/)[1]
+                .split(",")
+                .map(Number);
+
+                console.log("currentClass weeks: "+ currentClass.weeks);*/
+
+                const weekMatch = line.match(/Wk([\d,\-]+)/); // match both comma and dash
+                if (weekMatch) {
+                  const weekInfo = weekMatch[1];
+
+                  if (weekInfo.includes("-")) {
+                    // handle range
+                    const [startWeek, endWeek] = weekInfo.split("-").map(Number);
+                    currentClass.weeks = [];
+                    for (let i = startWeek; i <= endWeek; i++) {
+                      currentClass.weeks.push(i);
+                    }
+                  } else {
+                    // handle comma-separated weeks
+                    currentClass.weeks = weekInfo.split(",").map(Number);
+                  }
+
+                  console.log("currentClass weeks:", currentClass.weeks);
+                }
           } else if (line.startsWith("Venue:")) {
               currentClass.venue = line.split(":")[1].trim();
-          } else if (line.match(/^\d+\t/)) {
+          } else if (line.trimStart().match(/^\d+\t/)) {
               const studentData = line.split("\t");
-              currentClass.students.push({ name: studentData[1], vmsAcc: studentData[5].split("\r")[0] });
+              //const studentId = uuidv4();              
+              currentClass.students.push({ name: studentData[1], vmsAcc: studentData[5].split("\r")[0]});
+              //console.log("parseClassData for students: " + currentClass.students);
+              //studentData[5].split("\r")[0]
           }
       });
   
@@ -214,6 +251,19 @@ export class NewSemDialogComponent {
   
       return classes;
     };
+
+    generateIDFromName(fullName: string): string {
+      // Remove spaces and convert to uppercase
+      const name = fullName.replace(/\s+/g, '').toUpperCase();
+
+      // Sum of character codes
+      const codeSum = Array.from(name).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+      // Get last 4 characters (or fewer if name is short)
+      const suffix = name.slice(-4);
+
+      return `ID${codeSum}${suffix}`;
+    }
 
     processStudentFiles = (files: FileList) => {
       const fileReaders = [];
@@ -533,7 +583,7 @@ export class NewSemDialogComponent {
                     break;
                   }
             }
-            this.submit = false;        
+            //this.submit = false;        
           },
           error: (err) => {
               console.error('Error creating semester:', err);
@@ -607,12 +657,12 @@ export class NewSemDialogComponent {
                             break;
                           }
                     }
-                    this.submit = false;        
+                    //this.submit = false;        
                   },
                   error: (err) => {
                       console.error('Error creating class group:', err);
                       //this.toastr.error(err.error.message);
-                      this.errorMessage = err.error.message || 'Error: Class Group not created.';
+                      this.errorMessage = 'Error: Class Group not created.';
                       this.submit = false;          
                   }
                 })
@@ -632,7 +682,7 @@ export class NewSemDialogComponent {
                         break;
                       }
                 }
-                this.submit = false;        
+                //this.submit = false;        
               },
               error: (err) => {
                   console.error('Error creating module:', err);
@@ -651,7 +701,7 @@ export class NewSemDialogComponent {
             this.toastr.error("Lab File not uploaded. Please upload the file.","ERROR");
         }
         
-        if(this.selectedFiles && this.newSemesterForm.value.week1StartDate){
+        if(this.selectedFiles && startDate){
           try {
             console.log("Processing student files....");
             const classes = await this.processStudentFiles(this.selectedFiles);
@@ -661,6 +711,7 @@ export class NewSemDialogComponent {
             let processedClasses = 0;
 
             for (let classData of classes) {
+              console.log(classData.students);
                 for (let student of classData.students) {
                     console.log("Attempting to create new student if it does not exist");
                     const studentPayload = {
@@ -693,7 +744,7 @@ export class NewSemDialogComponent {
                                     break;
                                   }
                             }
-                            this.submit = false;        
+                            //this.submit = false;        
                           },
                           error: (err) => {
                               console.error('Error enrolling student:', err);
@@ -717,7 +768,7 @@ export class NewSemDialogComponent {
                                 break;
                               }
                         }
-                        this.submit = false;        
+                        //this.submit = false;        
                       },
                       error: (err) => {
                           console.error('Error creating student:', err);
@@ -880,7 +931,7 @@ export class NewSemDialogComponent {
                                 break;
                               }
                         }
-                        this.submit = false;        
+                        //this.submit = false;        
                       },
                       error: (err) => {
                           console.error('Error creating lab session:', err);

@@ -32,4 +32,8 @@ export interface SemesterDTO {
       return this.http.get<MessageResponse>(`${this.semesterUrl}`);
     }
 
+    getSpecificSemester(semesterId: string) : Observable<any> {
+      return this.http.get<MessageResponse>(`${this.semesterUrl}/getSemesterByID?semesterId=${semesterId}`);      
+    }
+
   }

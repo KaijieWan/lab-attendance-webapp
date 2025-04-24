@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="accManagement.component.scss">
     </head>
     <body>
+      <h1 mat-dialog-title style="margin-bottom: -50px; color: blueviolet;"><b>Role Management</b></h1>
       <div mat-dialog-title>
         <div class="slider-container">
           <button
@@ -27,60 +28,179 @@
       </div>
 
         <div mat-dialog-content>
+          <!-- Add Role Form -->
           <div *ngIf="currentView === 'addRole'">
-            <form [formGroup]="rolePermissionsForm">
-              <div class="role-container">
-                <label for="role" style="margin-top: -27px;">
-                  Role title:
-                  <input type="text" formControlName="create_role" name="role" />
-                </label>
-              </div>
-              
-              <h3 style="margin-bottom: -5px; color: blueviolet; align-self: center;">Permissions of the role:</h3>
-              <ul class="links">
-                <li *ngFor="let page of pages">
-                  <div class="permissions-container">
-                    <span class="title">{{ page.title }}</span>
+            <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper>          
+              <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
+                {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
+              </ng-template>
+              <!-- Permissions for pages access -->
+              <form [formGroup]="rolePermissionsForm">
+                <mat-step [label]="'Role Title'" [stepControl]="rolePermissionsForm.get('create_role')!">
+                  <h3>Role title:</h3>
+    
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="create_role" required>
+                  </mat-form-field>
+    
+                  <div>
+                    <button mat-button matStepperNext [disabled]="rolePermissionsForm.get('create_role')!.invalid">Next</button>
+                  </div>
+              </mat-step>
+    
+                <span *ngFor="let page of pages">
+                  <mat-step [stepControl]="rolePermissionsForm.get(page.title)!" [label]="page.title">
+                    
+                      <h3>Permissions for {{ page.title }}</h3>
+                      <mat-radio-group [formControlName]="page.title" style="display: flex; flex-direction: column;">
+                        <mat-radio-button [value]="removeSpaces(action.toLowerCase())" *ngFor="let action of pages_actions">{{ action }}</mat-radio-button>
+                      </mat-radio-group>
+                
+                      <div>
+                        <button mat-button matStepperNext [disabled]="rolePermissionsForm.get(page.title)!.invalid">Next</button>
+                      </div>
+                    
+                  </mat-step>
+                </span>
+    
+                <!-- Permissions for functions access -->
+                <span *ngFor="let function of functions">
+                  <mat-step [stepControl]="rolePermissionsForm.get(function.title)!" [label]="function.title">
+                      <h3>Permissions for {{ function.title }}</h3>
+                      <mat-radio-group [formControlName]="function.title" style="display: flex; flex-direction: column;">
+                        <mat-radio-button [value]="underscoreSpaces(action.toLowerCase())" *ngFor="let action of functions_actions">{{ action }}</mat-radio-button>
+                      </mat-radio-group>
+                
+                      <div>
+                        <button mat-button matStepperNext [disabled]="rolePermissionsForm.get(function.title)!.invalid">Next</button>
+                      </div>
+                  </mat-step>    
+                </span>
 
-                    <label class="container" *ngFor="let action of pages_actions">
-                      {{ action }}
-                      <input type="checkbox" [formControlName]="getControlName(page.title, action)">
-                      <span class="checkmark"></span>
-                    </label>
-      
-                  </div>           
-                  
-                  <li *ngFor="let function of functions">
-                    <div class="permissions-container">
-                      <span class="title">{{ function.title }}</span>
-  
-                      <label class="container" *ngFor="let action of functions_actions">
-                        {{ action }}
-                        <input type="checkbox" [formControlName]="getControlName(function.title, action)">
-                        <span class="checkmark"></span>
-                      </label>      
-                    </div>           
-                </li>
+                <!-- Reporting To -->
+                <span>
+                  <mat-step [stepControl]="rolePermissionsForm.get('reports_to')!" [label]="'Reports To'">
+                      <h3>This role will report to:</h3>
+                      <mat-checkbox *ngFor="let item of distinctRoles" (change)="onCheckboxChangeCreateRole($event, item)"
+                        style="display: flex; flex-direction: column;">
+                        {{ item }}
+                      </mat-checkbox>
+                
+                      <div>
+                        <button mat-button matStepperNext [disabled]="rolePermissionsForm.get('reports_to')!.invalid">Next</button>
+                      </div>
+                  </mat-step>    
+                </span> 
 
-                <li>
-                  <div class="permissions-container">
-                    <span class="title">Reports To:</span>
-
-                    <label class="container" *ngFor="let item of distinctRoles">
-                      {{ item }}
-                      <input type="checkbox" (change)="onCheckboxChangeCreateRole($event, item)">
-                      <span class="checkmark"></span>
-                    </label>      
-                  </div>           
-                </li>
-              </ul> 
-
-            </form>
+              </form>
+                            
+              <!-- Step 3 -->
+              <mat-step [label]="'Submission'">           
+                <h3>Confirmation</h3>
+                <p>Review the details before submitting.</p>
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button (click)="rolePermissionsForm.valid && createRole()" [disabled]="!rolePermissionsForm.valid">
+                  <span *ngIf="!submit">Add Role</span>
+                  <span *ngIf="submit">
+                  Adding...</span>
+                </button>
+                
+              </mat-step>
+            </mat-horizontal-stepper>
           </div>
 
+          <!-- Update Role Form -->
           <div *ngIf="currentView === 'updateRole'">
-            <form [formGroup]="updateRoleForm">
-              <div class="dropdown">
+            <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper>          
+              <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
+                {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
+              </ng-template>
+              <!-- Permissions for pages access -->
+              <form [formGroup]="updateRoleForm">
+                <mat-step [label]="'Role Title'" [stepControl]="updateRoleForm.get('update_role')!">
+                  <h3>Select available Role title:</h3>
+    
+                  <mat-form-field appearance="outline">
+                    <mat-select (selectionChange)="onRoleChange($event)" formControlName="update_role">
+                        <mat-option *ngFor="let role of distinctRoles" [value]="role">{{ role }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+    
+                  <div>
+                    <button mat-button matStepperNext [disabled]="updateRoleForm.get('update_role')!.invalid">Next</button>
+                  </div>
+                </mat-step>
+    
+                <span *ngFor="let page of pages">
+                  <mat-step [stepControl]="updateRoleForm.get(getControlName(page.title))!" [label]="page.title">
+                    
+                      <h3>Permissions for {{ page.title }}</h3>
+                      <mat-radio-group [formControlName]="getControlName(page.title)" style="display: flex; flex-direction: column;">
+                        <mat-radio-button [value]="removeSpaces(action.toLowerCase())" *ngFor="let action of pages_actions">
+                          {{ action }}
+                        </mat-radio-button>
+                      </mat-radio-group>
+                
+                      <div>
+                        <button mat-button matStepperNext [disabled]="updateRoleForm.get(getControlName(page.title))!.invalid">Next</button>
+                      </div>
+                    
+                  </mat-step>
+                </span>
+    
+                <!-- Permissions for functions access -->
+                <span *ngFor="let function of functions">
+                  <mat-step [stepControl]="updateRoleForm.get(getControlName(function.title))!" [label]="function.title">
+                      <h3>Permissions for {{ function.title }}</h3>
+                      <mat-radio-group [formControlName]="getControlName(function.title)" style="display: flex; flex-direction: column;">
+                        <mat-radio-button [value]="underscoreSpaces(action.toLowerCase())" *ngFor="let action of functions_actions"
+                          [checked]="isChecked(function.title, action)" >
+                          {{ action }}
+                        </mat-radio-button>
+                      </mat-radio-group>
+                
+                      <div>
+                        <button mat-button matStepperNext [disabled]="updateRoleForm.get(getControlName(function.title))!.invalid">Next</button>
+                      </div>
+                  </mat-step>    
+                </span>
+
+                <!-- Reporting To -->
+                <span>
+                  <mat-step [stepControl]="updateRoleForm.get('reports_to')!" [label]="'Reports To'">
+                      <h3>This role will report to:</h3>
+                      <mat-checkbox *ngFor="let item of distinctRoles" (change)="onCheckboxChangeUpdateRole($event, item)"
+                        [checked]="isReportingRoleChecked(item)" style="display: flex; flex-direction: column;">
+                        {{ item }}
+                      </mat-checkbox>
+                
+                      <div>
+                        <button mat-button matStepperNext [disabled]="updateRoleForm.get('reports_to')!.invalid">Next</button>
+                      </div>
+                  </mat-step>    
+                </span>
+
+              </form>
+                            
+              <!-- Step 3 -->
+              <mat-step [label]="'Submission'">           
+                <h3>Confirmation</h3>
+                <p>Review the details before submitting.</p>
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button (click)="updateRoleForm.valid && updateRole()" [disabled]="!updateRoleForm.valid">
+                  <span *ngIf="!submit">Update Role</span>
+                  <span *ngIf="submit">
+                  Updating...</span>
+                </button>                
+              </mat-step>
+            </mat-horizontal-stepper>
+          </div>
+        </div>
+
+
+
+            <!--<form [formGroup]="updateRoleForm" style="gap: 10px;">
+              <div class="dropdown" style="margin-top: -35px;">
                 <label for="role">Role:</label>
                 <select type="text" id="role" name="role" [(ngModel)]="selectedRole" formControlName="update_role"
                   (change)="onRoleChange($event)">
@@ -89,53 +209,97 @@
                 </select>
               </div>
 
-              <h3 style="margin-bottom: -5px; color: blueviolet; align-self: center;">Permissions of the role:</h3>
-              <ul class="links">
-                <li *ngFor="let page of pages">
-                  <div class="permissions-container">
-                    <span class="title">{{ page.title }}</span>
 
-                    <label class="container" *ngFor="let action of pages_actions">
-                      {{ action }}
-                      <input type="checkbox" [formControlName]="getControlName(page.title, action)"
-                      [checked]="isChecked(page.title, action)">
-                      <span class="checkmark"></span>
-                    </label>
-      
-                  </div>           
-                  
-                  <li *ngFor="let function of functions">
-                    <div class="permissions-container">
-                      <span class="title">{{ function.title }}</span>
-  
-                      <label class="container" *ngFor="let action of functions_actions">
-                        {{ action }}
-                        <input type="checkbox" [formControlName]="getControlName(function.title, action)"
-                        [checked]="isChecked(function.title, action)">
-                        <span class="checkmark"></span>
-                      </label>      
-                    </div>           
-                </li>
+              <h3 style="margin-bottom: -3px; margin-top: -16px; color: blueviolet; align-self: center;">Permissions of the role</h3>
 
-                <li>
-                  <div class="permissions-container">
-                    <span class="title">Reports To:</span>
+              <span *ngFor="let page of pages">
+                <span>
+                  <mat-accordion>
+                    <mat-expansion-panel #dropdown4 style="width: 800px;" (opened)="onPanelOpened(dropdown4)">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <div fxLayout="row" fxLayoutAlign="space-between center" > 
+                            {{ page.title }}
+                          </div>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <span *ngFor="let action of pages_actions">
+                        <mat-list-item>
+                          <div fxLayout="row" fxLayoutAlign="space-between center" style="display: flex; flex-direction: column;"> 
+                            <label class="container">
+                              {{ action }}
+                              <input type="checkbox" [formControlName]="getControlName(page.title, action)"
+                              [checked]="isChecked(page.title, action)">
+                              <span class="checkmark"></span>
+                            </label>
+                          </div>
+                        </mat-list-item>
+                      </span>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </span>          
+              </span>
 
-                    <label class="container" *ngFor="let item of distinctRoles">
-                      {{ item }}
-                      <input type="checkbox" (change)="onCheckboxChangeUpdateRole($event, item)"
-                      [checked]="isReportingRoleChecked(item)">
-                      <span class="checkmark"></span>
-                    </label>      
-                  </div>           
-                </li>
-              </ul>                          
+              <span *ngFor="let function of functions">
+                <span>
+                  <mat-accordion>
+                    <mat-expansion-panel #dropdown5 style="width: 800px;" (opened)="onPanelOpened(dropdown5)">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <div fxLayout="row" fxLayoutAlign="space-between center" > 
+                            {{ function.title }}
+                          </div>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <span *ngFor="let action of functions_actions">
+                        <mat-list-item>
+                          <div fxLayout="row" fxLayoutAlign="space-between center" style="display: flex; flex-direction: column;"> 
+                            <label class="container">
+                              {{ action }}
+                              <input type="checkbox" [formControlName]="getControlName(function.title, action)"
+                              [checked]="isChecked(function.title, action)">
+                              <span class="checkmark"></span>
+                            </label>      
+                          </div>
+                        </mat-list-item>
+                      </span>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </span>          
+              </span>
 
-            </form>            
-          </div>
-        </div>
+              <h3 style="margin-bottom: -3px; margin-top: 0px; color: blueviolet; align-self: center;">Reporting</h3>
+              <span>
+                <span>
+                  <mat-accordion>
+                    <mat-expansion-panel #dropdown6 style="width: 800px;" (opened)="onPanelOpened(dropdown6)">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <div fxLayout="row" fxLayoutAlign="space-between center" > 
+                            Reports To
+                          </div>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <span *ngFor="let item of distinctRoles">
+                        <mat-list-item>
+                          <div fxLayout="row" fxLayoutAlign="space-between center" style="display: flex; flex-direction: column;"> 
+                            <label class="container">
+                              {{ item }}
+                              <input type="checkbox" (change)="onCheckboxChangeUpdateRole($event, item)"
+                              [checked]="isReportingRoleChecked(item)">
+                              <span class="checkmark"></span>
+                            </label>
+                          </div>
+                        </mat-list-item>
+                      </span>
+                    </mat-expansion-panel>
+                  </mat-accordion>
+                </span>          
+              </span>                          
+            </form>-->            
+          
 
-        <div mat-dialog-actions class="item" *ngIf="currentView === 'addRole'">
+        <!--<div mat-dialog-actions class="item" *ngIf="currentView === 'addRole'">
           <span *ngIf="errorMessage" class="error-message">
             {{ errorMessage }}
           </span>
@@ -158,7 +322,8 @@
               Updating...</span>
             </button>
           </div>          
-        </div>
+        </div> -->
+        
         
     </body>
 </html>

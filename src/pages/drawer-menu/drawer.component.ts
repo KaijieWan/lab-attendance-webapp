@@ -99,6 +99,12 @@ export class DrawerComponent {
   changeSemester(semesterID: string){
     this.semesterID = semesterID;
     sessionStorage.setItem('semesterID', semesterID);
+    let week1StartDate: Date = new Date(
+      this.semesters.find((semester) => semester.semester_ID === semesterID)?.week1StartDate ?? new Date()
+    );
+    sessionStorage.setItem('week1StartDate', week1StartDate.toISOString());
+    
+    
     this.refreshService.triggerRefresh();
 
     //Try to call the labSession API to preload the courses data first

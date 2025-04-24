@@ -119,3 +119,39 @@ export function addTimeBy1HourMinus10Minutes(timeStr: any) {
 
     return adjustedHours + adjustedMinutes;
 }
+
+/**
+ * Calculates the current week of the school semester, considering that week 8 is a recess week.
+ * @param week1StartDate - The Date object representing the start of the first week of the semester.
+ * @param currentDate - The Date object representing the current date to calculate the week for.
+ * @returns The adjusted week number of the semester.
+ */
+export function calculateSemesterWeek(week1StartDate: Date, currentDate: Date): number {
+    // Calculate the total number of days between week1StartDate and currentDate
+    const timeDifference = currentDate.getTime() - week1StartDate.getTime();
+    const dayDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    // Calculate the unadjusted week number
+    const unadjustedWeek = Math.floor(dayDifference / 7) + 1;
+
+    // Adjust the week number to account for the recess week
+    if (unadjustedWeek == 8) {
+        return -1; // This means recess week
+    }
+
+    if (unadjustedWeek > 8) {
+        return unadjustedWeek - 1; // E.g. 9 weeks difference means week 8 but 7 week diff is still week 7
+    }
+
+    return unadjustedWeek;
+}
+
+export function generateRandomColor(): string {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+  

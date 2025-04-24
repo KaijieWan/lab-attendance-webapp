@@ -11,108 +11,126 @@
     </head>
     <body>
         <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"><b>Create New User</b></h1>
-        <div mat-dialog-content>
+        <div mat-dialog-content style="width: 100%;">
+          <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper style="width: 100%;">          
+            <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
+              {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
+            </ng-template>
+            <!-- User Details -->
             <form [formGroup]="profileForm" class="form">
-                <label for="name">
-                    Name:
-                    <input type="name" formControlName="name" name="name" />
-                </label>
-                <label for="username">
-                  Username:
-                  <input type="username" formControlName="username" name="username" />
-              </label>
-                <label for="email">
-                    Email:
-                    <input type="email"  formControlName="email" name="email" />
-                </label>
-                <div class="dropdown">
-                  <label for="role">Role:</label>
-                  <select id="role" name="role" [(ngModel)]="selectedRole" formControlName="role">
-                    <option value="" disabled style="background-color: gray">Select available role</option>
-                    <option *ngFor="let item of distinctRoles" [value]="item">{{ item }}</option>
-                  </select>
+              <mat-step [label]="'User Details'" [stepControl]="profileForm.get('email')!">
+                  <h3>Username:</h3>  
+                  <mat-form-field appearance="outline">
+                    <input matInput type="username"  formControlName="username" required>
+                  </mat-form-field>
+                  <h3>Full Name:</h3>  
+                  <mat-form-field appearance="outline">
+                    <input matInput type="name" matInput formControlName="name" required>
+                  </mat-form-field>
+                  <h3>Email:</h3>  
+                  <mat-form-field appearance="outline">
+                    <input matInput type="email" formControlName="email" required>
+                  </mat-form-field>
+  
+                <div>
+                  <button mat-button matStepperNext [disabled]="profileForm.get('email')!.invalid">Next</button>
                 </div>
-                
-                <ul class="links">
-                  <div style="display: flex; flex-direction: column;">
-                    <span class="title">Assign Modules:</span>
-                    <label class="container" style="color: red; margin-top: 10px; margin-bottom: -20px;">
-                      Check All Modules
-                      <input type="checkbox" (change)="checkAllBoxes($event)">
-                      <span class="checkmark"></span>
-                    </label>
-                  </div>
-                  
-                    <div class="permissions-container">                                            
-                      <label class="container" *ngFor="let module of modules">
-                        {{ module }}
-                        <input type="checkbox" (change)="onCheckboxChangeAssignModule($event, module)"
-                        [checked]="checkModule()">
-                        <span class="checkmark"></span>
-                      </label>     
-        
-                    </div>     
-                </ul> 
-
-                <!-- <label for="angularDropdown">Select an item:</label>
-                      <select id="angularDropdown" [(ngModel)]="selectedItem" name="angularDropdown">
-                        <option *ngFor="let item of items" [value]="item">{{ item }}</option>
-                      </select>
-                -->
-        
-                <label for="newPassword">
-                    Password:
-                    <input
-                    id="newPassword"
-                    type="password"
-                    formControlName="newPassword"
-                    name="newPassword"
-                    (input)="checkPasswordStrength(profileForm.get('newPassword')?.value ?? '')"/>
-                </label>
-                  
-                  <!-- Password Strength -->
-                  <label style="text-align: center;">Password Strength: {{ passwordStrength }}</label>
+              </mat-step>
               
-                  <!-- Synchronous Validation Errors -->
-                  <div *ngIf="profileForm.get('newPassword')?.errors">
-                    <!--<p *ngIf="profileForm.get('newPassword')?.hasError('required')" class="error-message">
-                      Password is required.
-                    </p> -->
-                    <p *ngIf="profileForm.get('newPassword')?.hasError('minlength')" class="error-message">
-                      Password must be at least 8 characters.
-                    </p>
-                  </div>
+              <!-- Role -->
+              <mat-step [label]="'Role'" [stepControl]="profileForm.get('role')!">
+                <h3>Select available role:</h3>  
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="role">
+                      <mat-option *ngFor="let role of distinctRoles" [value]="role">{{ role }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+  
+                <div>
+                  <button mat-button matStepperNext [disabled]="profileForm.get('role')!.invalid">Next</button>
+                </div>
+              </mat-step>
               
-                  <!-- Async Validation Errors -->
-                  <div *ngIf="profileForm.get('newPassword')?.pending">Checking password...</div>
-                  <div *ngIf="profileForm.get('newPassword')?.errors?.['needsUppercase']" class="error-message">
-                    Password must include at least one uppercase letter.
-                  </div>
-                  <div *ngIf="profileForm.get('newPassword')?.errors?.['needsNumber']" class="error-message">
-                    Password must include at least one number.
-                  </div>
-        
-                  <label for="confirmPassword">
-                    Confirm Password:
-                    <input id="confirmPassword" type="password" formControlName="confirmPassword" name="confirmPassword"/>
-                  </label>
-                  
-                  <div *ngIf="profileForm.hasError('mismatch') && profileForm.touched" class="error-message">
-                    Passwords do not match.
-                  </div>
+              <!-- Assign Modules -->
+              <span>
+                <mat-step [stepControl]="profileForm.get('modulesAssigned')!" [label]="'Modules'">
+                    <h3>Assign Modules:</h3>
+                    <span class="permissions-container"></span>
+                    <mat-checkbox (change)="checkAllBoxes($event)">Check All Modules</mat-checkbox>
+                    <mat-checkbox *ngFor="let module of modules" (change)="onCheckboxChangeAssignModule($event, module)"
+                      [checked]="checkModule()" style="display: flex; flex-direction: column;">
+                      {{ module }}
+                    </mat-checkbox>
+              
+                    <div>
+                      <button mat-button matStepperNext [disabled]="profileForm.get('modulesAssigned')!.invalid">Next</button>
+                    </div>
+                </mat-step>    
+              </span>
 
+              <mat-step [label]="'Password'" [stepControl]="profileForm.get('confirmPassword')!">
+                <h3>New Password:</h3>  
+                <mat-form-field appearance="outline">
+                  <input matInput type="password"  formControlName="newPassword" required 
+                  (input)="checkPasswordStrength(profileForm.get('newPassword')?.value ?? '')">
+                </mat-form-field>
+
+                <!-- Password Strength -->
+                <p></p>
+                <mat-label style="text-align: center;">Password Strength: {{ passwordStrength }}</mat-label>
+            
+                <!-- Synchronous Validation Errors -->
+                <div *ngIf="profileForm.get('newPassword')?.errors">
+                  <!--<p *ngIf="profileForm.get('newPassword')?.hasError('required')" class="error-message">
+                    Password is required.
+                  </p> -->
+                  <p *ngIf="profileForm.get('newPassword')?.hasError('minlength')" class="error-message">
+                    Password must be at least 8 characters.
+                  </p>
+                </div>
+            
+                <!-- Async Validation Errors -->
+                <div *ngIf="profileForm.get('newPassword')?.pending">Checking password...</div>
+                <div *ngIf="profileForm.get('newPassword')?.errors?.['needsUppercase']" class="error-message">
+                  Password must include at least one uppercase letter.
+                </div>
+                <div *ngIf="profileForm.get('newPassword')?.errors?.['needsNumber']" class="error-message">
+                  Password must include at least one number.
+                </div>
+
+                <h3>Confirm New Password:</h3>  
+                <mat-form-field appearance="outline">
+                  <input matInput type="password" matInput formControlName="confirmPassword" required>
+                </mat-form-field>
+
+                <div *ngIf="profileForm.hasError('mismatch') && profileForm.touched" class="error-message">
+                  Passwords do not match.
+                </div>
+  
                 <span *ngIf="errorMessage" class="error-message">
                   {{ errorMessage }}
                 </span>
+
+                <div>
+                  <button mat-button matStepperNext [disabled]="profileForm.get('confirmPassword')!.invalid">Next</button>
+                </div>
+              </mat-step>                          
+
             </form>
-        </div>
-        <div mat-dialog-actions class="item">
-          <button type="button" mat-dialog-close>Cancel</button>
-          <button type="button" (click)="profileForm.valid && submitDetails()" [disabled]="!profileForm.valid">
-            <span *ngIf="!submit">Create User</span>
-            <span *ngIf="submit">
-              Creating...</span>
-          </button>
+                          
+            <!-- Submission -->
+            <mat-step [label]="'Submission'">           
+              <h3>Confirmation</h3>
+              <p>Review the details before submitting.</p>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button (click)="profileForm.valid && submitDetails()" [disabled]="!profileForm.valid">
+                <span *ngIf="!submit">Create User</span>
+                <span *ngIf="submit">
+                Creating...</span>
+              </button>              
+            </mat-step>
+          </mat-horizontal-stepper>         
+
         </div>
     </body>
 </html>

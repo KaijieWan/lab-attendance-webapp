@@ -3,7 +3,7 @@ import { Component, ViewEncapsulation, ViewChild, Output, EventEmitter } from "@
 import { ReactiveFormsModule } from "@angular/forms";
 import { Router, RouterModule, RouterOutlet } from "@angular/router";
 import { ConnectorModel, DataBinding, DataSourceModel, Diagram, DiagramComponent, DiagramModule, DiagramTools, HierarchicalTree, IDropEventArgs, 
-  LayoutModel, NodeModel, ShapeStyleModel, IClickEventArgs, 
+  LayoutModel, NodeModel, ShapeStyleModel, IClickEventArgs, ScrollSettingsModel,
   AnnotationConstraints} from "@syncfusion/ej2-angular-diagrams";
 import { DataManager } from "@syncfusion/ej2-data";
 import { finalize } from "rxjs";
@@ -66,12 +66,7 @@ export class AccHierarchyComponent {
         this.fetchDistinctRoles();
       }
     })
-
-    this.diagram!.scrollSettings.canAutoScroll = false;
-    this.diagram!.scrollSettings.scrollLimit = "Infinity";
-    
-    
-    
+            
   }
 
   switchView(view: 'users' | 'roles'): void {
@@ -201,6 +196,10 @@ export class AccHierarchyComponent {
       }
   };
   
+  public scrollSettings?: ScrollSettingsModel = {
+    canAutoScroll: false,
+    scrollLimit: 'Diagram'
+  };
 
   public layout: LayoutModel = {
     type:'OrganizationalChart'
@@ -252,6 +251,10 @@ export class AccHierarchyComponent {
       this.diagram.doLayout();
     }    
   }
+
+  public snapSettings: Object = {
+    constraints: 0 // Disables the grid lines
+  };
 
   goBack(){
     this.router.navigate(['/drawer/accManagement']);

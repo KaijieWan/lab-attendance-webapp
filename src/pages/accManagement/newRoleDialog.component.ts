@@ -1,25 +1,40 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewInit, Component, Inject } from '@angular/core';
-import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormBuilder, FormArray} from '@angular/forms';
+import { AfterViewInit, Component, Inject, QueryList, ViewChildren } from '@angular/core';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormBuilder, FormArray, FormsModule} from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from '../../service/user.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { debounceTime, map, Observable, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
 import { ToastrService, ToastrModule } from 'ngx-toastr';
-
+import { MatListModule } from '@angular/material/list';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-newRoleDialog-page',
   standalone: true,
   templateUrl: './newRoleDialog.component.html',
 
-  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, MatDialogModule, MatButtonModule, CommonModule],
+  imports: [ReactiveFormsModule, RouterOutlet, DatePipe, MatDialogModule, MatButtonModule, CommonModule,
+     MatExpansionModule, MatExpansionPanel, MatListModule, MatRadioModule, MatCheckboxModule,
+     MatStepperModule, MatInputModule, MatButtonModule, MatFormFieldModule, FormsModule,
+     MatSelectModule, MatOptionModule
+  ],
   styleUrl: './newRoleDialog.component.scss'
 })
 
 export class NewRoleDialogComponent {
+  @ViewChildren(MatExpansionPanel) dropdownPanels!: QueryList<MatExpansionPanel>;
+
     submit: boolean = false;
     rolePermissionsForm: FormGroup;
     updateRoleForm: FormGroup;
@@ -27,7 +42,7 @@ export class NewRoleDialogComponent {
     selectedRole: string = '';
     displayPermissions: any[] = [];
     currentView: 'addRole' | 'updateRole' = 'addRole';
-    allowedActions: string[] = ['read', 'write', 'delete', 'allow']
+    allowedActions: string[] = ['Read, Create, Delete, Update', 'Read, Update', 'Read', 'No Access', 'Allow', 'Do Not Allow']
     selectedPermissions: { [key: string]: string[] } = {};
 
     errorMessage: string = '';
@@ -44,13 +59,13 @@ export class NewRoleDialogComponent {
 
     functions = [
         { title: 'Role Management'},
-        { title: 'Create New User'},
+        //{ title: 'User Management'},
         { title: 'Add New Semester'}
     ]
     
-    pages_actions = ['Read', 'Write', 'Delete'];
+    pages_actions = ['Read, Create, Delete, Update', 'Read, Update', 'Read', 'NA'];
 
-    functions_actions = ['Allow'];
+    functions_actions = ['Allow', 'Do Not Allow'];
 
     constructor(
         public dialogRef: MatDialogRef<NewRoleDialogComponent>,
@@ -60,101 +75,139 @@ export class NewRoleDialogComponent {
         private fb: FormBuilder,
         private toastr: ToastrService,
     ) {
-        this.rolePermissionsForm = this.fb.group({});
-        this.updateRoleForm = this.fb.group({});
-    }
-
-    getControlName(page: string, action: string): string {
-        return `${page}_${action}`.replace(/\s+/g, '_').toLowerCase();
-      }
-
-    ngOnInit() {
         this.rolePermissionsForm = this.fb.group({
-            create_role: new FormControl('', Validators.required),
-            reports_to: this.fb.array([]),
+          create_role: new FormControl('', Validators.required),
+          reports_to: this.fb.array([]),
         });
 
         this.updateRoleForm = this.fb.group({
-            update_role: new FormControl('', Validators.required),
-            reports_to: this.fb.array([]),
+          update_role: new FormControl('', Validators.required),
+          reports_to: this.fb.array([]),
         });
-    
-        // Dynamically create form controls for each page and action [Create role]
-        this.pages.forEach((page) => {
-          this.pages_actions.forEach((action) => {
-            const controlName = this.getControlName(page.title, action);
-            this.rolePermissionsForm.addControl(controlName, new FormControl(false));
-          });
+
+        this.pages.forEach(page => {
+          this.rolePermissionsForm.addControl(page.title, new FormControl('', Validators.required));          
         });
 
         this.functions.forEach((Function) => {
-            this.functions_actions.forEach((action) => {
-              const controlName = this.getControlName(Function.title, action);
-              this.rolePermissionsForm.addControl(controlName, new FormControl(false));
-            });
+          this.rolePermissionsForm.addControl(Function.title, new FormControl('', Validators.required));
         });
 
+        this.pages.forEach(page => {
+          this.updateRoleForm.addControl(
+            this.getControlName(page.title),
+            new FormControl(null)
+          );
+        });
+
+        this.functions.forEach(func => {
+          this.updateRoleForm.addControl(
+            this.getControlName(func.title),
+            new FormControl(null)
+          );
+        });
+    }
+
+    getControlName(page: string): string {
+        return `${page}`.replace(/\s+/g, '_').toLowerCase();
+    }
+
+    formatTitle(text: string): string {
+      return text
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+
+    formatPageAction(text: string): string {
+      return text
+        .split(',')                      // Split string by commas
+        .map(action => action.trim())    // Trim spaces
+        .map(action => action.charAt(0).toUpperCase() + action.slice(1)) // Capitalize
+        .join(', ');   
+    }
+
+    formatFunctionAction(text: string){
+      return text
+      .split('_')                      // Split string by commas
+      .map(action => action.trim())    // Trim spaces
+      .map(action => action.charAt(0).toUpperCase() + action.slice(1)) // Capitalize
+      .join(' '); 
+    }
+
+    ngOnInit() {
         this.rolePermissionService.getDistinctRoles().subscribe({
             next: (response) => {
               this.distinctRoles = response;
             }
-        })
+        })        
+    }
 
-        this.pages.forEach((page) => {
-            this.pages_actions.forEach((action) => {
-              const controlName = this.getControlName(page.title, action);
-              this.updateRoleForm.addControl(controlName, new FormControl(false));
-            });
-          });
-  
-          this.functions.forEach((Function) => {
-              this.functions_actions.forEach((action) => {
-                const controlName = this.getControlName(Function.title, action);
-                this.updateRoleForm.addControl(controlName, new FormControl(false));
-              });
-          });
-        
+    ngAfterViewInit(){
+      this.dropdownPanels.toArray();
     }
 
     switchView(view: 'addRole' | 'updateRole'): void {
         this.currentView = view;
     }
 
-    onRoleChange(event: Event): void {
-        const selectedRole = (event.target as HTMLSelectElement).value;
-        this.toUpdateRole = selectedRole;
-        this.fetchPermissions(selectedRole);
+    onRoleChange(event: MatSelectChange): void {
+      console.log("onRoleChange called!", event.value);
+      const selectedRole = event.value;
+      this.toUpdateRole = selectedRole;
+      this.fetchPermissions(selectedRole);
     }
 
     fetchPermissions(role: string): void {
         this.rolePermissionService.getRolePermissions(role).subscribe({
             next: (response) => {
+                console.log(response);
                 this.displayPermissions = response;
                 this.reportingRoles = this.displayPermissions[0].reportsTo.split(',');
-                this.displayPermissions.forEach(item => {
-                    const actions = item.actions.split(',');
-                    this.selectedPermissions[item.permissionType] = actions;
-                    
-                    this.allowedActions.forEach((allowedAction) => {
-                      const controlName = this.getControlName(item.permissionType, allowedAction);
-            
-                      if (this.updateRoleForm.contains(controlName)) {
-                        // Update existing form control's value
-                        this.updateRoleForm.get(controlName)?.setValue(actions.includes(allowedAction));
-                      } else {
-                        this.updateRoleForm.addControl(
-                          controlName,
-                          new FormControl(actions.includes(allowedAction))
-                        );
-                      }
-                    });    
-                })
-                console.log(this.displayPermissions);
-                console.log(this.selectedPermissions);
+                const reportsTo: FormArray = this.updateRoleForm.get('reports_to') as FormArray;
+                this.reportingRoles.forEach(role => {
+                  if (!reportsTo.value.includes(role)) {
+                    reportsTo.push(new FormControl(role));
+                  }
+                });
 
-                
+                this.displayPermissions.forEach(item => {
+                  const pageActions = item.actions=="na" ? item.actions.toUpperCase() : this.formatPageAction(item.actions);
+                  const functionActions = this.formatFunctionAction(item.actions);
+                  const controlName = this.getControlName(this.formatTitle(item.permissionType));
+                  console.log(this.formatTitle(item.permissionType));
+
+                  console.log(`Formatted Page Actions: ${pageActions}`);
+                  console.log(`Formatted Function Actions: ${functionActions}`);
+                  console.log(`Control Name: ${controlName}`);              
+                    
+                  // Check if the stored action is in the allowed list
+                  if(this.pages_actions.includes(pageActions)){
+                    console.log(`Setting value: ${pageActions} for ${controlName}`);
+                    this.updateRoleForm.get(controlName)?.setValue(this.removeSpaces(pageActions.toLowerCase()) || null);
+                  } else {
+                    console.log(`Action ${pageActions} not found in pages_actions!`);
+                  }
+
+                  if(this.functions_actions.includes(functionActions)){
+                    console.log(`Setting value: ${functionActions} for ${controlName}`);
+                    this.updateRoleForm.get(controlName)?.setValue(this.underscoreSpaces(functionActions.toLowerCase()) || null);
+                  } else {
+                    console.log(`Action ${functionActions} not found in functions_actions!`);
+                  }
+                  
+                  
+                })
             }
         })
+    }
+
+    onPanelOpened(openedPanel: MatExpansionPanel){
+      this.dropdownPanels.forEach((item) => {
+        if(openedPanel!==item){
+          item.close();
+        }
+      })
     }
 
     isChecked(permission: string, action: string): boolean {
@@ -206,7 +259,7 @@ export class NewRoleDialogComponent {
     onCheckboxChangeCreateRole(event: any, item: string) {
       const reportsTo: FormArray = this.rolePermissionsForm.get('reports_to') as FormArray;
     
-      if (event.target.checked) {
+      if (event.checked) {
         // Add item if checked
         reportsTo.push(new FormControl(item));
       } else {
@@ -221,7 +274,7 @@ export class NewRoleDialogComponent {
     onCheckboxChangeUpdateRole(event: any, item: string){
       const reportsTo: FormArray = this.updateRoleForm.get('reports_to') as FormArray;
     
-      if (event.target.checked) {
+      if (event.checked) {
         // Add item if checked
         reportsTo.push(new FormControl(item));
       } else {
@@ -237,33 +290,33 @@ export class NewRoleDialogComponent {
       return this.reportingRoles?.includes(reportingRole) || false;
     }
 
+    removeSpaces(action: string): string {
+      return action.replace(/\s/g, '').toLowerCase();
+    }
+
+    underscoreSpaces(action: string): string {
+      return action.replace(/\s/g, '_');
+    }
+
     createRole(){
         this.submit = true;
         const formValues = this.rolePermissionsForm.value;
 
         // Group permissions by permissionType (page title)
         const pagePermissions = this.pages.map((page) => {
-            const pages_actions = this.pages_actions
-                .filter((action) => formValues[this.getControlName(page.title, action)])
-                .join(',');
-
             return {
-                permissionType: page.title.toLowerCase().replace(/\s+/g, '_'),
-                actions: pages_actions ? pages_actions.toLowerCase() : 'na',
+                permissionType: page.title.toLowerCase().replace(/\s+/g, '_'),                
+                actions: formValues[page.title],
             };
-
         })
 
         const functionPermissions = this.functions.map((func) => {
-            const functions_actions = this.functions_actions
-            .filter((action) => formValues[this.getControlName(func.title, action)])
-            .join(',');
-
             return {
                 permissionType: func.title.toLowerCase().replace(/\s+/g, '_'),
-                actions: functions_actions ? functions_actions.toLowerCase() : 'na',
+                actions: formValues[func.title],
             };
         })
+        console.log(this.rolePermissionsForm.value);
 
         // Combine pages and functions permissions
         const permissions = [...pagePermissions, ...functionPermissions];
@@ -304,32 +357,26 @@ export class NewRoleDialogComponent {
     }
 
     updateRole(){
-      this.submit = true;
-        const formValues = this.updateRoleForm.value;
+        this.submit = true;
+        const formValues = this.updateRoleForm.value;       
 
         // Group permissions by permissionType (page title)
         const pagePermissions = this.pages.map((page) => {
-            const pages_actions = this.pages_actions
-                .filter((action) => formValues[this.getControlName(page.title, action)])
-                .join(',');
-
-            return {
-                permissionType: page.title.toLowerCase().replace(/\s+/g, '_'),
-                actions: pages_actions ? pages_actions.toLowerCase() : 'na',
+          const controlName = this.getControlName(page.title); 
+          return {
+              permissionType: page.title.toLowerCase().replace(/\s+/g, '_'),                
+              actions: formValues[controlName],
             };
-
         })
 
         const functionPermissions = this.functions.map((func) => {
-            const functions_actions = this.functions_actions
-            .filter((action) => formValues[this.getControlName(func.title, action)])
-            .join(',');
-
+          const controlName = this.getControlName(func.title);
             return {
                 permissionType: func.title.toLowerCase().replace(/\s+/g, '_'),
-                actions: functions_actions ? functions_actions.toLowerCase() : 'na',
+                actions: formValues[controlName],
             };
         })
+        console.log(this.rolePermissionsForm.value);
 
         // Combine pages and functions permissions
         const permissions = [...pagePermissions, ...functionPermissions];

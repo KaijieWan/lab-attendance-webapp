@@ -11,76 +11,112 @@
     </head>
     <body>
       <h2 style="text-align: center; margin-bottom: 10px;">Lab Session Details</h2>
-      <div class="lab_info" *ngIf="labSessions.length>0">
-        <h3>Module: <span style="color: blue;">{{ labSessions[0].classGroupID.moduleCode }}</span></h3>
-        <h3>Lab Group: <span style="color: blue;">{{ labSessions[0].classGroupID.classGroupID }}</span></h3>
-        <h3>Lab Session Venue: <span style="color: blue;">{{ labSessions[0].lab.id.labName }}</span></h3>
-        <h3>Room: <span style="color: blue;">{{ labSessions[0].lab.id.room }}</span></h3>      
-        <h3>Time: <span style="color: blue;">{{ labSessions[0].startTime | customTimePipe}} - {{ labSessions[0].endTime | customTimePipe}}</span></h3>
-        <h3>Date:</h3> 
-        <div class="dropdown">
-          <!--<label for="date">Date:</label>-->
-          <select id="role" name="date" [(ngModel)]="selectedDate"
-            (change)="onDateChange($event)">
-            <option value="" disabled style="background-color: gray">Select available date</option>
-            <option *ngFor="let item of dates" [value]="item">{{ item | date: 'dd/MM/yyyy'}}</option>
-          </select>
+      <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; width: 100%;">
+        <div class="lab_info" *ngIf="labSessions.length>0">
+          <h3>Module: <span style="color: blue;">{{ labSessions[0].classGroupID.moduleCode }}</span></h3>
+          <h3>Lab Group: <span style="color: blue;">{{ labSessions[0].classGroupID.classGroupID }}</span></h3>
+          <h3>Lab Session Venue: <span style="color: blue;">{{ labSessions[0].lab.id.labName }}</span></h3>
+          <h3>Room: <span style="color: blue;">{{ labSessions[0].lab.id.room }}</span></h3>      
+          <h3>Time: <span style="color: blue;" id="labSessionTime">{{ labSessions[0].startTime | customTimePipe}} - {{ labSessions[0].endTime | customTimePipe}}</span></h3>
+          <h3>Date:</h3> 
+          <div class="dropdown">
+            <!--<label for="date">Date:</label>-->
+            <select id="role" name="date" [(ngModel)]="selectedDate"
+              (change)="onDateChange($event)">
+              <option value="" disabled style="background-color: gray">Select available date</option>
+              <option *ngFor="let item of dates" [value]="item">{{ item | date: 'dd/MM/yyyy'}}</option>
+            </select>
+          </div>
+          <button mat-raised-button class="deleteLabSession_button" id="deleteLabSessionButton" (click)="deleteLabSession(selectedDate)"> 
+            Delete Lab Session</button>          
+        </div>
+        <button mat-raised-button style="margin-top: auto;" (click)="addStudentToLabGroup()">         
+          <span class="material-symbols-outlined">
+            person_add </span>
+            Add Student To Lab Group
+        </button>
+      </div>
+      <div class="slider-container">
+        <button
+          [class.active]="currentView === 'general'"
+          (click)="switchView('general')">
+          General Student Details
+        </button>
+        <button
+          [class.active]="currentView === 'specific'"
+          (click)="switchView('specific')">
+          Specific Attendance Details
+        </button>
+        <div class="slider" [class.general]="currentView === 'general'" [class.specific]="currentView === 'specific'"></div>
+      </div>
+
+      <div *ngIf="currentView === 'general'">
+        <div class="attendance-list">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let attendance of attendancesToDisplay" class="oval-row">
+                <td>{{ attendance.student.fullName }}</td>
+                <td>{{ attendance.student.Student_ID }}</td>
+                <td>
+                  <button mat-raised-button class="deleteStudentButton" (click)="deleteStudentFromClassGroup(attendance.student.Student_ID)"> 
+                    <span class="material-symbols-outlined">
+                      delete </span>
+                    </button> 
+                </td>   
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       
-      <div class="attendance-list">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Student ID</th>
-                  <th>Status</th>
-                  <th>Remarks</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let attendance of attendancesToDisplay" class="oval-row">
-                  <td>{{ attendance.student.fullName }}</td>
-                  <td>{{ attendance.student.Student_ID }}</td>
+      <div *ngIf="currentView === 'specific'">
+        <div class="attendance-list">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Student ID</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let attendance of attendancesToDisplay" class="oval-row">
+                    <td>{{ attendance.student.fullName }}</td>
+                    <td>{{ attendance.student.Student_ID }}</td>
+                    <td>
+                      <div style="display: flex; flex-direction: row;">
+                        <div class="dropdown" style="margin-left: -10px; margin-top: 6px;">
+                          <select id="role" name="date" [(ngModel)]="attendance.status"
+                            (change)="onStatusChange(attendance.status, attendance.student.Student_ID)">
+                            <option value="" disabled style="background-color: gray">Select available date</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Present">Present</option>
+                            <option value="Late">Late</option>
+                            <option value="Excused">Excused</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Withdrawn">Withdrawn</option>
+                          </select>                      
+                        </div>
+                        <button mat-raised-button class="submitChangeButton" [id]="'submitChangeButton_' + attendance.student.Student_ID" (click)="submitStatusChange(attendance.student.Student_ID, attendance.attendance_ID)"> 
+                          Submit <br> Changes</button>
+                      </div>                                        
+                    </td>                                                        
                   <td>
-                    <div class="radio-button">
-                      <input type="radio" [id]="'pending_status_' + attendance.student.Student_ID" [name]="'status_' + attendance.student.Student_ID" value="Pending" 
-                      [checked]="attendance.status === 'Pending'"
-                      (change)="onStatusChange('Pending', attendance.student.Student_ID)">
-                      <label [for]="'pending_status_' + attendance.student.Student_ID">Pending</label><br>
-
-                      <input type="radio" [id]="'present_status_' + attendance.student.Student_ID" [name]="'status_' + attendance.student.Student_ID" value="Present" 
-                      [checked]="attendance.status === 'Present'"
-                      (change)="onStatusChange('Present', attendance.student.Student_ID)">
-                      <label [for]="'present_status_' + attendance.student.Student_ID">Present</label><br>
-
-                      <input type="radio" [id]="'late_status_' + attendance.student.Student_ID" [name]="'status_' + attendance.student.Student_ID" value="Late" 
-                      [checked]="attendance.status === 'Late'"
-                      (change)="onStatusChange('Late', attendance.student.Student_ID)">
-                      <label [for]="'late_status_' + attendance.student.Student_ID">Late</label><br>
-
-                      <input type="radio" [id]="'excused_status_' + attendance.student.Student_ID" [name]="'status_' + attendance.student.Student_ID" value="Excused" 
-                      [checked]="attendance.status === 'Excused'"
-                      (change)="onStatusChange('Excused', attendance.student.Student_ID)">
-                      <label [for]="'excused_status_' + attendance.student.Student_ID">Excused</label><br>
-
-                      <input type="radio" [id]="'absent_status_' + attendance.student.Student_ID" [name]="'status_' + attendance.student.Student_ID" value="Absent" 
-                      [checked]="attendance.status === 'Absent'"
-                      (change)="onStatusChange('Absent', attendance.student.Student_ID)">
-                      <label [for]="'absent_status_' + attendance.student.Student_ID">Absent</label><br>
-
-                      <button mat-raised-button class="submitChangeButton" [id]="'submitChangeButton_' + attendance.student.Student_ID" (click)="submitStatusChange(attendance.student.Student_ID, attendance.attendance_ID)"> 
-                        Submit <br> Changes</button>
-                    </div>                    
-                    
-                 <td>
-                  <button mat-raised-button (click)="openRemarksDialog(attendance.student.fullName, attendance.remarks, attendance.attendance_ID)"> 
-                    Click To <br> View Remarks </button> 
-                 </td>                                         
-                </tr>
-              </tbody>
-            </table>
+                    <button mat-raised-button (click)="openRemarksDialog(attendance.student.fullName, attendance.remarks, attendance.attendance_ID)"> 
+                      Click To <br> View Remarks </button> 
+                  </td>                                         
+                  </tr>
+                </tbody>
+              </table>
+        </div>
       </div>
-      
     </body>
 </html>

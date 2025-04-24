@@ -3,6 +3,11 @@ import { Component } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { RouterOutlet, RouterModule, ActivatedRoute, Router } from "@angular/router";
 import { ClassGroupService } from "../../service/classGroup.service";
+import { ToastrModule, ToastrService } from "ngx-toastr";
+import { CreateUserDialogComponent } from "../accManagement/createUserDialog.component";
+import { RolePermissionService } from "../../service/rolePermission.service";
+import { MatDialog } from "@angular/material/dialog";
+import { CreateLabSessionComponent } from "./createLabSession.component";
 
 interface ClassGroupDTO {
     classGroupId: {
@@ -13,6 +18,11 @@ interface ClassGroupDTO {
     module:{
         moduleCode: string
     }
+}
+
+interface RolePermission {
+    permissionType: string,
+    actions: string[];
 }
 
 @Component({
@@ -29,7 +39,8 @@ export class ClassGroupsComponent{
     classGroups: ClassGroupDTO[] = [];
 
     constructor(private route: ActivatedRoute, private classGroupService: ClassGroupService,
-        private router: Router
+        private router: Router, private toastr: ToastrService, private rolePermissionService: RolePermissionService,
+        private dialog: MatDialog,
     ) {}
 
     ngOnInit() {
@@ -55,5 +66,47 @@ export class ClassGroupsComponent{
     navigateToLabSessions(labGroupId: string){
         this.router.navigate([`/drawer/courses/${this.courseId}/labgroups/${labGroupId}`]);
     }
+
+    openCreateLabSession(): void {
+        console.log("openCreateLabSession");
+        const sessionData = sessionStorage.getItem('userDetails');
+        if (!sessionData) {
+          //Perhaps use a toastr to display denied message
+          console.log("openCreateLabSession: sessionData not found");
+          this.toastr.error("Access To Creating New Lab Session Denied");
+        }
+        else{
+          console.log("openCreateUserDialog: sessionData found");
+          const userDetails = JSON.parse(sessionData);
+          console.log(userDetails.user.role);
+          this.rolePermissionService.getRolePermissions(userDetails.user.role.toString()).subscribe({
+            next: (response: RolePermission[]) => {
+              const permission = response.find(
+                (item) => item.permissionType === 'courses_page'
+              );
+              console.log(permission);
+              
+              if (!permission || !permission.actions.includes('create')) {
+                //Perhaps use a toastr to display denied message
+                console.log("Permission for allow creating of new lab session not found")
+                this.toastr.error("Access To Creating New Lab Session Denied", "ERROR");
+              }
+              else{
+                const dialogRef = this.dialog.open(CreateLabSessionComponent, {
+                  width: '1000px',
+                  panelClass: 'custom-dialog-container',
+                  data: { courseId: this.courseId }, // Optional data to pass to dialog
+                });
+          
+                dialogRef.afterClosed().subscribe(result => {
+                  console.log('Dialog closed. Result:', result);
+                });
+              }
+              console.log("Permission check completed")
+            },
+            error: (err) => console.log("Error in permission check", err)
+          });      
+        }
+      }
 
 }
