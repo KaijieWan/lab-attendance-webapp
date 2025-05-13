@@ -326,7 +326,7 @@ export class CreateLabSessionComponent {
               switch(response.status){
                   case "SUCCESS" : {
                       console.log('Creation of lab session successful:', response);
-                      this.toastr.success("Created New Class Group!", "SUCCESS");
+                      this.toastr.success("Created New Lab Session!", "SUCCESS");
                                     
                       break;
                     }                    

@@ -93,7 +93,7 @@
               <p>Review the details before submitting.</p>
               <button mat-button matStepperPrevious>Back</button>
               <button mat-button (click)="newModuleForm.valid && createSemester()" [disabled]="!newModuleForm.valid">
-                <span *ngIf="!submit">Create New Lab Session</span>
+                <span *ngIf="!submit">Add New Module</span>
                 <span *ngIf="submit">
                 Creating...</span>
               </button>              

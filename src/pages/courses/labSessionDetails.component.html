@@ -20,7 +20,6 @@
           <h3>Time: <span style="color: blue;" id="labSessionTime">{{ labSessions[0].startTime | customTimePipe}} - {{ labSessions[0].endTime | customTimePipe}}</span></h3>
           <h3>Date:</h3> 
           <div class="dropdown">
-            <!--<label for="date">Date:</label>-->
             <select id="role" name="date" [(ngModel)]="selectedDate"
               (change)="onDateChange($event)">
               <option value="" disabled style="background-color: gray">Select available date</option>
@@ -30,11 +29,18 @@
           <button mat-raised-button class="deleteLabSession_button" id="deleteLabSessionButton" (click)="deleteLabSession(selectedDate)"> 
             Delete Lab Session</button>          
         </div>
-        <button mat-raised-button style="margin-top: auto;" (click)="addStudentToLabGroup()">         
-          <span class="material-symbols-outlined">
-            person_add </span>
-            Add Student To Lab Group
-        </button>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <button mat-raised-button style="margin-top: auto;" (click)="addStudentToLabGroup()">         
+            <span class="material-symbols-outlined">
+              person_add </span>
+              <span style="margin-top: 4px;">Add Student To Lab Group</span>
+          </button>
+          <button mat-raised-button style="margin-top: auto; display: none;" id="addStudentToLabSession" (click)="addStudentToLabSession()">         
+            <span class="material-symbols-outlined">
+              person_add </span>
+              <span style="margin-top: 4px;">Add Student To This Lab Session</span>
+          </button>
+        </div>
       </div>
       <div class="slider-container">
         <button

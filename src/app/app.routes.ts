@@ -51,6 +51,10 @@ export const routes: Routes = [
             { path: 'students', component: StudentsComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'students_page'}
              },
+             {
+                path: 'students/:studentID',
+                loadComponent: () => import('../pages/students/studentDetails.component').then(m => m.StudentDetailsComponent)
+            },       
             { path: 'labSchedules', component: LabSchedulesComponent,
                 canActivate: [PermissionGuard], data: {permissionType: 'lab_schedules_page'}
              },

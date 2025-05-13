@@ -19,7 +19,11 @@
         <button mat-raised-button (click)="openCreateLabSession()" *ngIf="semesterCourses.length>0"> 
           <span class="material-symbols-outlined">
             experiment </span>
-          Create New Lab Session </button>  
+          Create New Lab Session </button>
+          <button mat-raised-button (click)="openCreateAdHocSession()" *ngIf="semesterCourses.length>0"> 
+            <span class="material-symbols-outlined">
+              pending_actions </span>
+            Create Ad Hoc Session </button>  
       </div>
       
         <ul class="links">

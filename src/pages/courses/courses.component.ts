@@ -13,6 +13,7 @@ import { RolePermissionService } from '../../service/rolePermission.service';
 import { CreateLabSessionComponent } from './createLabSession.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AddNewModuleComponent } from './addNewModule.component';
+import { CreateAdHocSessionComponent } from './createAdHocSession.component';
 
 interface ClassGroupDTO {
   classGroupId: {
@@ -142,6 +143,48 @@ openCreateLabSession(): void {
           }
           else{
             const dialogRef = this.dialog.open(CreateLabSessionComponent, {
+              width: '1000px',
+              panelClass: 'custom-dialog-container',
+              data: { courseId: this.courseId }, // Optional data to pass to dialog
+            });
+      
+            dialogRef.afterClosed().subscribe(result => {
+              console.log('Dialog closed. Result:', result);
+            });
+          }
+          console.log("Permission check completed")
+        },
+        error: (err) => console.log("Error in permission check", err)
+      });      
+    }
+  }
+
+  openCreateAdHocSession(): void {
+    console.log("openCreateAdHocSession");
+    const sessionData = sessionStorage.getItem('userDetails');
+    if (!sessionData) {
+      //Perhaps use a toastr to display denied message
+      console.log("openCreateAdHocSession: sessionData not found");
+      this.toastr.error("Access To Creating Ad Hoc Session Denied");
+    }
+    else{
+      console.log("openCreateAdHocSessionDialog: sessionData found");
+      const userDetails = JSON.parse(sessionData);
+      console.log(userDetails.user.role);
+      this.rolePermissionService.getRolePermissions(userDetails.user.role.toString()).subscribe({
+        next: (response: RolePermission[]) => {
+          const permission = response.find(
+            (item) => item.permissionType === 'courses_page'
+          );
+          console.log(permission);
+          
+          if (!permission || !permission.actions.includes('create')) {
+            //Perhaps use a toastr to display denied message
+            console.log("Permission for allow creating of ad hoc session not found")
+            this.toastr.error("Access To Creating Ad Hoc Session Denied", "ERROR");
+          }
+          else{
+            const dialogRef = this.dialog.open(CreateAdHocSessionComponent, {
               width: '1000px',
               panelClass: 'custom-dialog-container',
               data: { courseId: this.courseId }, // Optional data to pass to dialog

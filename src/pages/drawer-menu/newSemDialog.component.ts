@@ -1,11 +1,11 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { AfterViewInit, Component, Inject } from '@angular/core';
-import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormBuilder} from '@angular/forms';
+import {FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, FormBuilder, FormsModule} from '@angular/forms';
 import { Router, RouterOutlet } from '@angular/router';
-import { UserService } from '../../service/user.service';
+import { MessageResponse, UserService } from '../../service/user.service';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { debounceTime, finalize, map, Observable, of } from 'rxjs';
+import { debounceTime, finalize, forkJoin, map, Observable, of } from 'rxjs';
 import { RolePermissionService } from '../../service/rolePermission.service';
 import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -32,6 +32,7 @@ import { v4 as uuidv4 } from 'uuid';
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    FormsModule
   ],
   providers: [  
     MatDatepickerModule,  
@@ -57,6 +58,7 @@ export class NewSemDialogComponent {
     selectedFiles: FileList | null = null;
     labFile: File | null = null;
     displayFiles: File[] = [];
+    progress: number = 0;
 
     pages = [
         { title: 'Courses Page' },
@@ -696,6 +698,7 @@ export class NewSemDialogComponent {
             
           }
           console.log(labDataMap);
+          this.progress = 10;
           //setProgress(10); // Set progress to 10% after lab file processing
         } else {
             this.toastr.error("Lab File not uploaded. Please upload the file.","ERROR");
@@ -878,7 +881,46 @@ export class NewSemDialogComponent {
                     
                     this.labSessionService.createLabSession(newLabSessionPayload).pipe(
                       finalize(() => {
-                        for (let student of classData.students) {
+                        const attendanceRequests: Observable<MessageResponse>[] = classData.students.map((student: { vmsAcc: any; }) => {
+                          const attendancePayload = {
+                            absentID: null,
+                            labSessionID: `${classData.courseCode}-${classData.classGroup}-${labInfo.lab}-${labInfo.labRoom}-${week}-${classData.dayOfWeek}-${this.datePipe.transform(calculatedDate, 'yyyy-MM-dd')}-${classData.startTime}-${classData.endTime}`,
+                            remarks: "",
+                            semesterID: semesterID,
+                            status: "Pending",
+                            isMakeUpSession: false,
+                            studentID: student.vmsAcc,
+                          }
+                        
+                          return this.attendanceService.createAttendance(attendancePayload);
+                        });
+
+                        forkJoin<MessageResponse[]>(attendanceRequests).subscribe({
+                          next: (responses) => {
+                            responses.forEach((response) => {
+                              switch (response.status) {
+                                case "SUCCESS":
+                                  console.log('Creation of attendance successful:', response);
+                                  break;
+                                default:
+                                  console.log('Error Message:', response);
+                                  this.errorMessage = response.message;
+                                  break;
+                              }
+                            });
+                            this.submit = false; // Only set to false once ALL are done
+                            console.log("All attendance creations are completed.");
+                            this.toastr.success("All lab sessions and attendances created", "SUCCESS")
+                          },
+                          error: (err) => {
+                            console.error('Error creating attendance:', err);
+                            this.errorMessage = err.error?.message || 'Error: Attendance not created.';
+                            this.submit = false;
+                          }
+                        });
+
+                        
+                        /*for (let student of classData.students) {
                           console.log("Attempting to create new attendance");
                           const attendancePayload = {
                             absentID: null,
@@ -914,7 +956,7 @@ export class NewSemDialogComponent {
                                 this.submit = false;          
                             }
                           })
-                        }
+                        }*/
                       })
                     ).subscribe({             
                       next: (response) => {
@@ -939,16 +981,15 @@ export class NewSemDialogComponent {
                           this.errorMessage = err.error.message || 'Error: Lab session not created.';
                           this.submit = false;          
                       }
-                    })
-                    
-                    
+                    })                                        
                 }
 
                 processedClasses++;
+                this.progress = 10 + (processedClasses / expectedTasks) * 90
                 //setProgress(10 + (processedClasses / expectedTasks) * 90);
             }
 
-            this.toastr.info("Uploaded data and created new semester", "SUCCESS");
+            this.toastr.info("Uploaded data, creating semester now", "SUCCESS");
             return true;
           } catch (err) {
               //setAlert("Error processing student files, please ensure student files are in the correct format.");

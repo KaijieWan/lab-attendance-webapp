@@ -10,7 +10,150 @@
         <link rel="stylesheet" href="dashboard.component.scss">
     </head>
     <body>
-        
+        <mat-card class="dashboard-card">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">Dashboard</h1>
+            </div>
+          
+            <div class="dashboard-grid">
+              <!-- Total Students -->
+              <mat-card class="metric-card">
+                <mat-card-header class="metric-header">
+                  <mat-card-title>Total Students</mat-card-title>
+                  <!--<mat-icon>group</mat-icon>-->
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-value">{{ totalStudents }}</div>
+                  <p class="metric-subtext">Enrolled for {{ selectedSemester }}</p>
+                </mat-card-content>
+              </mat-card>
+          
+              <!-- Total Absences -->
+              <mat-card class="metric-card">
+                <mat-card-header class="metric-header">
+                  <mat-card-title>Total Absences</mat-card-title>
+                  <!--<mat-icon>cancel</mat-icon>-->
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-value">{{ totalAbsences }}</div>
+                  <p class="metric-subtext">Across all enrolled students</p>
+                </mat-card-content>
+              </mat-card>
+          
+              <!-- Pending Approval Absences -->
+              <mat-card class="metric-card">
+                <mat-card-header class="metric-header">
+                  <mat-card-title>Pending Approval Absences</mat-card-title>
+                  <!--<mat-icon>warning</mat-icon>-->
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-value">{{ pendingAbsences }}</div>
+                  <p class="metric-subtext">Requires administrative action</p>
+                </mat-card-content>
+              </mat-card>
+          
+              <!-- Pending Make-up Sessions -->
+              <mat-card class="metric-card">
+                <mat-card-header class="metric-header">
+                  <mat-card-title>Pending Make-up Sessions</mat-card-title>
+                  <!--<mat-icon>event_available</mat-icon>-->
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-value">{{ awaitingMakeUpAbsences }}</div>
+                  <p class="metric-subtext">Scheduled for make-up lessons</p>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </mat-card>
+
+          <mat-card class="module-analytics-container">
+            <div class="header">
+              <div class="title-badge">
+                <h1>Module Analytics</h1>
+                <span class="custom-badge">
+                  {{ selectedModule || 'No module selected' }}
+                </span>
+              </div>
+          
+              <mat-form-field appearance="outline" class="module-select">
+                <mat-select [(value)]="selectedModule" (selectionChange)="onModuleChange($event.value)">
+                  <mat-option *ngFor="let module of modules" [value]="module">{{ module }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          
+            <div class="cards-grid">
+              <mat-card class="stat-card">
+                <div class="stat-header">
+                  <span>Total Students</span>
+                  <!--<mat-icon>group</mat-icon>-->
+                </div>
+                <div class="stat-content">
+                  <div>{{ totalStudentsInModule }}</div>
+                  <p>Enrolled in selected module</p>
+                </div>
+              </mat-card>
+          
+              <!-- Repeat for other 3 cards similarly -->
+            </div>
+          
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Weekly Attendance Rate</mat-card-title>
+                <mat-card-subtitle>Average attendance rate per week for selected module</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <!-- Chart integration with ngx-charts or similar -->
+              </mat-card-content>
+            </mat-card>
+          
+            <mat-card class="low-attendance-table">
+              <mat-card-header>
+                <mat-card-title>Students with Low Attendance</mat-card-title>
+                <mat-card-subtitle>Below 75% attendance</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <table mat-table [dataSource]="currentStudents" class="mat-elevation-z1">
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+                  </ng-container>
+
+                  <!-- ID Column -->
+                  <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef>Student ID</th>
+                    <td mat-cell *matCellDef="let element">{{element.id}}</td>
+                  </ng-container>
+
+                  <!-- Attendance Column -->
+                  <ng-container matColumnDef="attendance">
+                    <th mat-header-cell *matHeaderCellDef>Attendance</th>
+                    <td mat-cell *matCellDef="let element">{{element.attendance}}%</td>
+                  </ng-container>
+
+                  <!-- Action Column -->
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef>Action</th>
+                    <td mat-cell *matCellDef="let element">
+                      <button mat-button (click)="goToProfile(element.id)">Go to Profile</button>
+                    </td>
+                  </ng-container>
+
+                  <!-- Header and Row Declarations -->
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+          
+                <div class="pagination-controls">
+                  <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                  <button mat-button (click)="handlePreviousPage()" [disabled]="currentPage === 1">Previous</button>
+                  <button mat-button (click)="handleNextPage()" [disabled]="currentPage === totalPages">Next</button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </mat-card>
+          
     </body>
 </html>
 

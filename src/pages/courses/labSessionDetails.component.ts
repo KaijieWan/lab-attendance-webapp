@@ -9,6 +9,7 @@ import { AttendanceService } from "../../service/attendance.service";
 import { ToastrModule, ToastrService } from "ngx-toastr";
 import Swal from 'sweetalert2';
 import { RolePermissionService } from "../../service/rolePermission.service";
+import { StudentDTO, StudentService } from "../../service/studentService";
 
 interface RolePermission {
     permissionType: string,
@@ -85,11 +86,13 @@ export class LabSessionDetailsComponent{
     labSessions: LabSessionDetailsDTO[] = [];
     dates: string[] = [];
     selectedDate: string = "";
+    students: StudentDTO[] = [];
 
     constructor(private route: ActivatedRoute, private labSessionService: LabSessionService,
         private attendanceService: AttendanceService, private renderer: Renderer2, private el: ElementRef,
         private toastr: ToastrService, private rolePermissionService: RolePermissionService,
         private classGroupService: ClassGroupService, private customTimePipe: CustomTimePipe,
+        private studentService: StudentService,
     ) {}
 
     ngOnInit() {
@@ -159,6 +162,11 @@ export class LabSessionDetailsComponent{
             deleteLabSessionButton.style.display = "inline-flex"
         }
 
+        const addStudentToLabSessionButton = document.getElementById('addStudentToLabSession');
+        if(addStudentToLabSessionButton){
+            addStudentToLabSessionButton.style.display = "inline-flex"
+        }
+
         const labSession = this.labSessions.find(item => item.date === selectedDate);
         const currentDisplayedLabTime = document.getElementById('labSessionTime');
         if(currentDisplayedLabTime){
@@ -181,7 +189,7 @@ export class LabSessionDetailsComponent{
         if (!sessionData) {
             //Perhaps use a toastr to display denied message
             console.log("deleteLabSession: sessionData not found");
-            this.toastr.error("Access To Creating New User Denied");
+            this.toastr.error("Access To Deleting Lab Sessions Denied");
         }
         else{
             console.log("deleteLabSession: sessionData found");
@@ -243,6 +251,160 @@ export class LabSessionDetailsComponent{
               }
             }            
           });
+    }
+
+    addStudentToLabSession(){
+        const sessionData = sessionStorage.getItem('userDetails');
+        if (!sessionData) {
+            //Perhaps use a toastr to display denied message
+            console.log("addStudentToLabSession: sessionData not found");
+            this.toastr.error("Access To Adding Student To Lab Sessions Denied");
+        }
+        else{
+            console.log("addStudentToLabSession: sessionData found");
+            const userDetails = JSON.parse(sessionData);
+            this.rolePermissionService.getRolePermissions(userDetails.user.role.toString()).subscribe({
+                next: (response: RolePermission[]) => {
+                    const permission = response.find(
+                        (item) => item.permissionType === 'courses_page'
+                    );
+                    
+                    if (!permission || !permission.actions.includes('update')) {
+                        //Perhaps use a toastr to display denied message
+                        console.log("Permission for adding student to lab sessions not found")
+                        this.toastr.error("Access To Adding Student To Lab Sessions Denied", "ERROR");
+                    }
+                    else{
+                        this.studentService.getStudentsBySemester(this.semester!).subscribe({
+                            next: (response) => {
+                              this.students = response;
+                              //console.log(this.students);
+                              this.confirmAddStudentToLabSession();
+                            },
+                            error: (err) => console.log("Error in fetching students",  err)
+                          })                        
+                    }
+                    console.log("Permission check completed")
+                },
+                error: (err) => console.log("Error in permission check", err)
+            });      
+        }
+    }
+
+    confirmAddStudentToLabSession(){
+        let selectedStudent = "";
+        if(this.students){
+            Swal.fire({
+                title: 'Search for student from this semester (Student ID) to add',
+                html: `
+                <style>
+                    .student-item {
+                        list-style: none;
+                        padding: 8px 12px;
+                        transition: background-color 0.2s;
+                    }
+                    .student-item:hover {
+                        background-color: #dbeafe; /* light blue */
+                    }
+                    .student-item.selected {
+                        background-color: #93c5fd; /* darker blue for selected item */
+                    }
+                </style>
+                <input type="text" id="searchInput" class="swal2-input" placeholder="Search student...">
+                <ul id="studentList">
+                    ${this.students.map(student => `<li class="student-item" style="cursor: pointer;">${student.Student_ID}</li>`).join("")}
+                </ul>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Select',
+                preConfirm: () => {
+                    if (!selectedStudent) {
+                        Swal.showValidationMessage('Please select a student');
+                    }
+                    return selectedStudent;
+                },
+                didOpen: () => {
+                    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+                    const studentItems = document.querySelectorAll('.student-item');
+            
+                    studentItems.forEach((item) => {
+                        (item as HTMLElement).style.display = 'none';
+                    });
+
+                    searchInput.addEventListener('keyup', () => {
+                        const filter = searchInput.value.toLowerCase();
+                        if(filter.length!=0){
+                            studentItems.forEach((item) => {
+                                const text = item.textContent?.toLowerCase();
+                                (item as HTMLElement).style.display = text!.includes(filter) ? 'block' : 'none';
+                            });
+                        } else{
+                            studentItems.forEach((item) => {
+                                (item as HTMLElement).style.display = 'none';
+                            });
+                        }
+                    });
+
+                    studentItems.forEach((item) => {
+                        item.addEventListener('click', () => {
+                          studentItems.forEach(i => i.classList.remove('selected'));
+                          item.classList.add('selected');
+                          selectedStudent = item.textContent!;
+                        });
+                      });
+                }
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    console.log("Selected student:", result.value);
+
+                    if(this.attendancesToDisplay.find(attendance => attendance.student.Student_ID === result.value)){
+                        this.toastr.error("This student is already added to this lab session", "ERROR");
+                        return;
+                    }   
+
+                    console.log(this.selectedDate);
+                    let labSessionID = "";
+                    this.labSessions.forEach((labSession) => {
+                        if(this.selectedDate === labSession.date){
+                            labSessionID = labSession.labSessionID;
+                        }
+                    })
+
+                    console.log("Attempting to create new attendance");
+                      const attendancePayload = {
+                        absentID: null,
+                        labSessionID: labSessionID,
+                        remarks: "",
+                        semesterID: this.semester,
+                        status: "Pending",
+                        //Probably need to query if it is a make up for this student
+                        isMakeUpSession: false,
+                        studentID: result.value,
+                      }
+
+                      this.attendanceService.createAttendance(attendancePayload).subscribe({             
+                        next: (response) => {
+                          switch(response.status){
+                              case "SUCCESS" : {
+                                  console.log('Creation of attendance successful:', response);
+                                  this.toastr.success("Added Student to Lab Session!", "SUCCESS");
+                                  break;
+                                }                    
+                                default: {
+                                  console.log('Error Message:', response);
+                                  this.toastr.error(response.message, response.status);
+                                  break;
+                                }
+                          }
+                        },
+                        error: (err) => {
+                            console.error('Error creating attendance:', err);
+                            this.toastr.error(err.error.message || 'Error: Attendance not created.');        
+                        }
+                      })
+                }
+            });
+        }
     }
 
     submitStatusChange(studentId:string, attendanceID: string){

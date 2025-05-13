@@ -1,0 +1,71 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Responsive Sidebar Menu</title>
+        <!-- Linking Google Font link for icons-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link rel="stylesheet" href="enrollStudentDialog.component.scss">
+    </head>
+    <body>
+        <div mat-dialog-title style="color: blueviolet;">
+            <b>Enroll Student In Lab Groups <br>(for latest semester: {{ semester }})</b>
+        </div>
+
+        <div mat-dialog-content>
+        <!-- Enroll Student In Lab Groups Form -->
+            <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper>          
+            <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
+                {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
+            </ng-template>
+            <!-- Permissions for pages access -->
+            <form [formGroup]="labGroupEnrolmentForm">
+                <mat-step [stepControl]="labGroupEnrolmentForm.get('enrolModules')!" [label]="'Enrol In Modules'">
+                    <h3>Select Modules To Be Enrolled In:</h3>
+                    <mat-checkbox *ngFor="let module of allSemesterModules" (change)="onCheckboxChange($event, module)"
+                      style="display: flex; flex-direction: column;" [disabled]="isModuleDisabled(module)">
+                      {{ module }}
+                    </mat-checkbox>
+              
+                    <div>
+                      <button mat-button matStepperNext [disabled]="labGroupEnrolmentForm.get('enrolModules')!.invalid" (click)="assignLabGroups()">Next</button>
+                    </div>
+                </mat-step>
+
+
+                <mat-step [label]="'Enrol In Lab Groups'" [stepControl]="labGroupEnrolmentForm.get('enrolLabGroups')!">
+                    <h3>Select available lab groups to enrol in <br> (For modules selected in the previous step):</h3>
+                    
+                    <div *ngIf="allSelectedModuleControlsAdded()" [formGroup]="enrolLabGroupsFormGroup">
+                        <div *ngFor="let selectedModule of selectedModules">
+                            <h4>{{ selectedModule }}</h4>
+                            <mat-form-field appearance="outline" style="width: 50%;">
+                                <mat-select (selectionChange)="onRoleChange($event)" [formControlName]="selectedModule">
+                                    <mat-option *ngFor="let role of selectedLabGroups.get(selectedModule) || []" [value]="role">{{ role }}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div>
+                      <button mat-button matStepperNext [disabled]="labGroupEnrolmentForm.get('enrolLabGroups')!.invalid">Next</button>
+                    </div>
+                  </mat-step>               
+
+            </form>
+                            
+            <!-- Step 3 -->
+            <mat-step [label]="'Submission'">           
+                <h3>Confirmation</h3>
+                <p>Review the details before submitting.</p>
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-button (click)="labGroupEnrolmentForm.valid && enrol()" [disabled]="!labGroupEnrolmentForm.valid">
+                <span *ngIf="!submit">Submit</span>
+                <span *ngIf="submit">
+                Submitting...</span>
+                </button>
+                
+            </mat-step>
+            </mat-horizontal-stepper>
+        </div>
+    </body>
+</html>

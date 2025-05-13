@@ -30,4 +30,8 @@ export interface StudentDTO {
       return this.http.get<any>(`${this.studentUrl}`);
     }
 
+    getStudentsBySemester(semesterId: string) : Observable<any> {
+      return this.http.get<any>(`${this.studentUrl}/getStudentsbySemester?semesterId=${semesterId}`)
+    }
+
   }

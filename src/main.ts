@@ -7,7 +7,7 @@ import { routes } from './app/app.routes';
 import { registerLicense } from '@syncfusion/ej2-base';
 
 // Registering Syncfusion license key
-registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF1cXGFCe0x0WmFZfVtgdV9EY1ZRQGYuP1ZhSXxWdkFjW39fcnBUR2ldUkJ9XUo=');
+registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF1cXGFCeEx3WmFZfVtgdVdMZVVbR3RPIiBoS35Rc0VmWXdfcXVdQ2ddU0ZyVEBV');
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));

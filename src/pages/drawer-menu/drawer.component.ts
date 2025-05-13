@@ -143,7 +143,7 @@ export class DrawerComponent {
           );
           console.log(permission);
           
-          if (!permission || !permission.actions.includes('allow')) {
+          if (!permission || permission.actions.includes('do_not_allow')) {
             //Perhaps use a toastr to display denied message
             console.log("Permission for adding new semesters not found")
             this.toastr.error("Access To Adding New Semester Denied", "ERROR");

@@ -12,13 +12,21 @@
     <body>
       <div>
         <h2 style="text-align: center; margin-bottom: 10px; align-content: center;">All Students Details</h2>
-        <div class="searchContainer">
-          <input 
-            type="text" 
-            (input)="onSearchInput($event)" 
-            placeholder="Search students..."
-            class="searchBox"
-          />
+        <div style="display: flex; flex-direction: row; align-items: center; width: 100%;">
+          <div class="searchContainer">
+            <input 
+              type="text" 
+              (input)="onSearchInput($event)" 
+              placeholder="Search students..."
+              class="searchBox"
+            />
+          </div>        
+          <button mat-raised-button (click)="addNewStudent()" style="margin-left: auto; display: flex; align-items: center;"> 
+            <span class="material-symbols-outlined">
+              person_add </span>
+              <span style="margin-top: -2px;">Create New Student</span>
+          </button> 
+           
         </div>
           <div class="student-list">
             <table>
@@ -26,12 +34,25 @@
                 <tr>
                   <th>Name</th>
                   <th>Student ID</th>
+                  <th>More Details</th>
+                  <th>Enroll Student In <br>Lab Groups</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let student of studentsToDisplay">
+                <tr *ngFor="let student of studentsToDisplay" class="oval-row">
                   <td>{{ student.fullName }}</td>
                   <td>{{ student.Student_ID }}</td>
+                  <td>
+                    <button mat-raised-button (click)="navigateToStudentDetails(student.Student_ID)"> 
+                      Click To <br> View More Details </button> 
+                    </td>
+                    <td>
+                      <button mat-raised-button (click)="openEnrollDialog(student.Student_ID)" style=" display: flex; align-items: center;"> 
+                        <span class="material-symbols-outlined">
+                          group_add </span>
+                          <span style="margin-top: -2px;">Enroll Student</span>
+                      </button>
+                    </td>
                 </tr>
               </tbody>
             </table>
