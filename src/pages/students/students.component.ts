@@ -114,8 +114,9 @@ export class StudentsComponent {
     this.searchTerm$.next(term); // Push the term into the Subject
   }
 
-  navigateToStudentDetails(studentID: string){
+  navigateToStudentDetails(studentID: string, fullName: string){
     this.router.navigate([`/drawer/students/${studentID}`]);
+    sessionStorage.setItem("selectedStudentName", fullName);
   }
 
   addNewStudent(){

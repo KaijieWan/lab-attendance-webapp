@@ -43,7 +43,7 @@
                   <td>{{ student.fullName }}</td>
                   <td>{{ student.Student_ID }}</td>
                   <td>
-                    <button mat-raised-button (click)="navigateToStudentDetails(student.Student_ID)"> 
+                    <button mat-raised-button (click)="navigateToStudentDetails(student.Student_ID, student.fullName)"> 
                       Click To <br> View More Details </button> 
                     </td>
                     <td>

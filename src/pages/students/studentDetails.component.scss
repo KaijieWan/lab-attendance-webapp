@@ -191,30 +191,145 @@ button:hover {
   background-color: #2980b9;
 }
 
-.submitChangeButton {
-  display: none;
-  background-color: #3498db;
-  color: #fff;
-  margin: 0px 5px;
-  border: none;
-  padding: 6px 8px; 
-  font-size: 14px;
-  gap: 5px;
-  cursor: pointer;
-  border-radius: 4px;
-  box-shadow: #444 solid;
+.dashboard-card {
+  padding: 2rem;
+  margin-bottom: 1.25rem;
 }
 
-.deleteLabSession_button {
-  display: none;
-  background-color: red;
-  border: none;
-  padding: 6px 8px; 
-  cursor: pointer;
-  border-radius: 4px;
-  box-shadow: #444 solid;
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.deleteLabSession_button:hover {
-  background-color: darkred;
+.dashboard-title {
+  font-size: 1.875rem;
+  font-weight: bold;
 }
+
+.dashboard-grid {
+  display: table;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.metric-card {
+  padding: 1rem;
+  margin-top: 12px;
+}
+
+.metric-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;  
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.metric-subtext {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.module-analytics-container {
+padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  .title-badge {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  h1 {
+      font-size: 2rem;
+      font-weight: bold;
+  }
+
+  .custom-badge {
+      border: 1px solid green;
+      color: green;
+      padding: 4px 8px;
+      border-radius: 4px;
+  }
+  }
+
+  .module-select {
+  width: 180px;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+
+  .stat-card {
+  padding: 1rem;
+
+  .stat-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+  }
+
+  .stat-content {
+      font-size: 1.5rem;
+      font-weight: bold;
+
+      p {
+      font-size: 0.8rem;
+      color: gray;
+      }
+  }
+  }
+}
+
+.chart-card {
+  margin-top: 2rem;
+}
+
+.student-list {
+  margin: 20px;
+  font-size: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  //border-radius: 2px;
+  border-spacing: 0 10px;
+}
+
+.oval-row {
+  background-color: #e6f7ff;
+  border-radius: 25px; 
+  overflow: hidden; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  display: table-row; 
+  margin-bottom: 17px;
+}
+
+.oval-row td {
+  border: none;
+  font-size: 17px;
+}
+
+th, td {
+  font-size: 16px;
+  padding: 14px 60px;
+  text-align: left;
+  border-bottom: 2px solid #3498db;
+}
+

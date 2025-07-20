@@ -218,3 +218,33 @@ label {
     border-color: #007bff;
     background-color: #f0f8ff;
   }
+
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust minmax as needed */
+    gap: 10px; /* Adjust gap as needed */
+  }
+
+  .selectedClassGroupRows {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgb(202, 194, 194);
+    padding: 2px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background-color: #f7f3f3;
+  }
+  
+  .row-item {
+    display: flex;
+    flex-direction: row;
+    padding-top: 13px;
+    gap: 4px;
+    align-items: center;
+  }
+  
+
+  

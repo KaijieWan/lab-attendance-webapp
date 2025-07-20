@@ -10,6 +10,66 @@
         <link rel="stylesheet" href="studentDetails.component.scss">
     </head>
     <body>
-        <h3 [(ngModel)]="studentID">{{ studentID }}</h3>
+        <h3 [(ngModel)]="studentID" style="text-align: center; margin-bottom: 0px; align-content: center;">Student ID: {{ studentID }}</h3>
+        <h3 [(ngModel)]="studentID" style="text-align: center; margin-bottom: 10px; align-content: center;">Name: {{ studentName }}</h3>
+
+
+        <mat-card class="dashboard-card">
+            <div class="dashboard-header">
+              <h1 class="dashboard-title">Overall Attendance</h1>
+            </div>
+          
+            <div class="dashboard-grid">
+              <mat-card class="metric-card">
+                <mat-card-header class="metric-header">
+                  <mat-card-title>{{ semesterMessage }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="metric-value" [style.color]="textColor">{{ overallAttendance }}%</div>
+                  <p class="metric-subtext" style="color: red">{{ alert }}</p>
+                </mat-card-content>
+              </mat-card>              
+            </div>
+        </mat-card>
+
+        <mat-card class="dashboard-card">
+          <div class="dashboard-header">
+            <h1 class="dashboard-title">Specific Attendance - Breakdown</h1>            
+          </div>
+          <h2 style="margin-top: -20px;">{{ semesterMessage }}</h2>
+
+          <div class="dashboard-grid">
+            <mat-card class="metric-card" *ngFor="let module of attendanceModules">
+              <mat-card-header class="metric-header">
+                <mat-card-title>{{ module }} ({{ getFilteredAttendance(module)[0].labsession.classGroupID.classGroupID }})
+                  <br>Attendance Rate for this module: <b>{{ calculateOverallAttendance(getFilteredAttendance(module)).toFixed(2) }}%</b>
+                </mat-card-title>
+              </mat-card-header>
+              <div class="student-list">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Make Up Session</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let attendance of getFilteredAttendance(module)" class="oval-row">
+                      <td>{{ attendance.labsession.date }}</td>
+                      <td>{{ attendance.labsession.startTime | customTimePipe }} - {{ attendance.labsession.endTime | customTimePipe }}</td>
+                      <td>{{ attendance.isMakeUpSession ? 'Yes' : 'No' }}</td>
+                      <td [ngStyle]="{ 'color': getStatusColor(attendance.status) }">
+                        {{ attendance.status }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </mat-card>       
+          </div>
+        </mat-card>
+
     </body>
 </html>

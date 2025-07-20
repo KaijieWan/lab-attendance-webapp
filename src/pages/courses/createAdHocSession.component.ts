@@ -17,7 +17,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatRadioModule } from '@angular/material/radio';
+import { MatRadioGroup, MatRadioModule } from '@angular/material/radio';
 import { MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { ClassGroupService } from '../../service/classGroup.service';
@@ -52,7 +52,7 @@ interface Students {
   imports: [ReactiveFormsModule, RouterOutlet, DatePipe, MatDialogModule, MatButtonModule, CommonModule,
     MatExpansionModule, MatExpansionPanel, MatListModule, MatListModule, MatRadioModule, MatCheckboxModule,
     MatStepperModule, MatInputModule, MatButtonModule, MatFormFieldModule, FormsModule, MatDatepickerModule,
-    MatSelectModule, MatOptionModule
+    MatSelectModule, MatOptionModule, MatRadioGroup
   ],
   providers: [  
     MatDatepickerModule,  
@@ -101,6 +101,7 @@ export class CreateAdHocSessionComponent {
   selectedFiles: FileList | null = null;
   displayFiles: File[] = [];
   studentIDs: string[] = [];
+  currentLabRoom: Map<string, [string, string]> = new Map();
 
   constructor(
       public dialogRef: MatDialogRef<CreateAdHocSessionComponent>,
@@ -115,7 +116,7 @@ export class CreateAdHocSessionComponent {
       private labSessionService: LabSessionService,
       private attendanceService: AttendanceService
   ) {
-    this.newLabSessionForm = new FormGroup({          
+    /*this.newLabSessionForm = new FormGroup({          
       labName: new FormControl('', Validators.required),
       labRoom: new FormControl('', Validators.required),
       date: new FormControl('', Validators.required),
@@ -124,6 +125,26 @@ export class CreateAdHocSessionComponent {
       //classGroup: new FormControl('', Validators.required),
       studentList: new FormControl([], Validators.required),
       module: new FormControl('', Validators.required),
+      uploadMethod: new FormControl('', Validators.required),
+      courseName: new FormControl('', Validators.required),
+      classGroups: new FormControl([], Validators.required),
+    });*/
+
+    this.newLabSessionForm = this.fb.group({      
+      date: new FormControl('', Validators.required),
+      start_time: new FormControl('', Validators.required),
+      end_time: new FormControl('', Validators.required),
+      studentList: new FormControl([], Validators.required),
+      module: new FormControl('', Validators.required),
+      uploadMethod: new FormControl('', Validators.required),
+      courseName: new FormControl(''),
+      classGroups: this.fb.array([]),
+      classGroupNames: this.fb.array([]),   
+      labDetailsMethod: new FormControl('', Validators.required),
+      labName: new FormControl(''),
+      labRoom: new FormControl(''),
+      /*currentLabName: new FormControl(''),
+      currentLabRoom: new FormControl(''),*/
     });
 
     const id = sessionStorage.getItem("id");    
@@ -144,6 +165,8 @@ export class CreateAdHocSessionComponent {
     else{
       this.semesterCourses = courses.filter((item: string) => this.modulesAssigned.includes(item));  
     }
+
+
   };
 
     ngAfterViewInit(){
@@ -171,9 +194,18 @@ export class CreateAdHocSessionComponent {
       const softwareLabNames = this.labs.software.map(lab => lab.name);
       this.displayLabNames = [...hardwareLabNames, ...softwareLabNames];
 
-      this.newLabSessionForm.get('module')?.valueChanges.subscribe(selectedModule => {
+      /*this.newLabSessionForm.get('module')?.valueChanges.subscribe(selectedModule => {
         this.fetchClassGroups(selectedModule, this.semester);        
-      });
+      });*/
+      
+    }
+
+    getLab(group: string): string {
+      return this.currentLabRoom.get(group)?.[0] || '';
+    }
+
+    getLabRoom(group: string): string {
+      return this.currentLabRoom.get(group)?.[1] || '';
     }
 
     changeLab(labName: string){
@@ -186,6 +218,81 @@ export class CreateAdHocSessionComponent {
           this.displayLabRoomNumbers = lab.rooms;
         }
       }
+    }
+
+    checkUploadMethod(){
+      if(this.newLabSessionForm.get('uploadMethod')?.value == "current"){        
+        const classGroupsArray = this.newLabSessionForm.get('classGroups') as FormArray;
+        this.newLabSessionForm.get('classGroupNames')?.value.forEach((classGroupName: string) => {
+          this.currentLabRoom.set(classGroupName, ["", ""]);
+          this.newLabSessionForm.addControl(classGroupName, new FormControl(["", ""]));
+          /*classGroupsArray.push(
+            this.fb.group({
+              classGroupName: [classGroupName],
+              labName: [''],
+              labRoom: ['']
+            })
+          );*/
+        });
+        
+      }
+      this.newLabSessionForm.get('classGroupNames')?.value.forEach((classGroupName: string) => {
+          console.log(this.newLabSessionForm.get(classGroupName)?.value);
+      });
+      
+    }
+
+    currentLabChange(event: any, classGroup: string) {
+      const selectedValue = event.value;
+      const item = this.currentLabRoom.get(classGroup)
+      if(item){
+        item[0] = selectedValue;
+      }
+      console.log(this.currentLabRoom);
+    }
+
+    currentLabRoomChange(event: any, classGroup: string) {
+      const selectedValue = event.value;
+      const item = this.currentLabRoom.get(classGroup)
+      if(item){
+        item[1] = selectedValue;
+      }
+      console.log(this.currentLabRoom);
+
+      const hasEmptyRoom = Array.from(this.currentLabRoom.values()).some(
+        ([labName, labRoom]) => labName === '' || labRoom === ''
+      );
+      
+      if (hasEmptyRoom) {
+        this.newLabSessionForm.get('labDetailsMethod')?.setValue('Filler');
+        this.newLabSessionForm.get('labDetailsMethod')?.markAsTouched();
+        console.log("labDetailsMethod marked as touched");
+      }
+    }
+
+    changeModule(module: string){
+      this.fetchClassGroups(module, this.semester);
+      this.newLabSessionForm.get('studentList')?.setValue(['Filler']);
+      this.newLabSessionForm.get('studentList')?.markAsTouched();
+    }
+
+    toggleUpload(){
+      //Set the form controls and arrays as empty and untouched everytime the method is toggled
+      this.newLabSessionForm.get('studentList')?.setValue([]);
+      this.droppedFiles = [];
+      this.newLabSessionForm.get('studentList')?.markAsUntouched();
+
+      const classGroups: FormArray = this.newLabSessionForm.get('classGroupNames') as FormArray;
+      classGroups.clear();
+      this.currentLabRoom.clear();
+
+      this.newLabSessionForm.get('labDetailsMethod')?.markAsUntouched();      
+    }
+
+    markUploadLabRoom(){
+      this.newLabSessionForm.get('labDetailsMethod')?.markAsTouched();
+      this.newLabSessionForm.get('labDetailsMethod')?.setValue('Filler');
+      console.log("labDetailsMethod marked as touched");
     }
 
     fetchModules(semseterID: string){
@@ -279,6 +386,23 @@ export class CreateAdHocSessionComponent {
         }
       });
     }
+  }
+
+  onCheckboxChangeAddGroup(event: any, item: string){
+    const classGroups: FormArray = this.newLabSessionForm.get('classGroupNames') as FormArray;
+  
+    if (event.checked) {
+      // Add item if checked
+      classGroups.push(new FormControl(item));
+    } else {
+      // Remove item if unchecked
+      const index = classGroups.controls.findIndex(x => x.value === item);
+      if (index > -1) {
+        classGroups.removeAt(index);
+      }
+    }
+
+    console.log(classGroups.value);
   }
 
   readStudentIdsFromExcel(files: File[]) {

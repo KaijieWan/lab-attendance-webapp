@@ -10,32 +10,14 @@
         <link rel="stylesheet" href="createAdHocSession.component.scss">
     </head>
     <body>
-        <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"  *ngIf="courseId"><b>Create New Lab Session for {{courseId}}</b></h1>
+      <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"  *ngIf="semester"><b>Create Ad Hoc Session for {{semester}}</b></h1>
         <div mat-dialog-content style="width: 100%;">
           <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper style="width: 100%;">          
             <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
               {{ index + 1 }} <!-- Always show numbers instead of a checkmark -->
             </ng-template>
             <!-- Lab Session Details -->
-            <form [formGroup]="newLabSessionForm" class="form">
-              <mat-step [label]="'Lab Details'" [stepControl]="newLabSessionForm.get('labRoom')!">
-                  <h3>Lab:</h3>  
-                  <mat-form-field appearance="outline">
-                    <mat-select formControlName="labName">
-                      <mat-option *ngFor="let lab of displayLabNames" (click)="changeLab(lab)" [value]="lab">{{ lab }}</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <h3>Lab Room:</h3>  
-                  <mat-form-field appearance="outline">
-                    <mat-select formControlName="labRoom">
-                      <mat-option *ngFor="let rooms of displayLabRoomNumbers" [value]="rooms">{{ rooms }}</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-  
-                <div>
-                  <button mat-button matStepperNext [disabled]="newLabSessionForm.get('labRoom')!.invalid">Next</button>
-                </div>
-              </mat-step>
+            <form [formGroup]="newLabSessionForm" class="form">              
 
               <mat-step [label]="'Date & Timings'" [stepControl]="newLabSessionForm.get('end_time')!">
                 <h3>Date:</h3>  
@@ -70,37 +52,130 @@
                 <button mat-button matStepperNext [disabled]="newLabSessionForm.get('module')!.invalid">Next</button>
               </div>
             </mat-step> 
-              
-              <!-- Student List -->
-              <mat-step [label]="'Student List'" [stepControl]="newLabSessionForm.get('studentList')!">
-                <h3>Please upload student list excel file:</h3>  
-                <div
-                      class="dropzone"
-                      [class.dragover]="isDragOver"
-                      (dragover)="onDragOver($event)"
-                      (dragleave)="onDragLeave($event)"
-                      (drop)="onDropModule($event)"
-                    >
-                      <p>Drag and drop files here</p>
-                      <input type="file" multiple hidden (change)="uploadStudentFiles($event)" #fileInput/>
-                      <button type="button" (click)="fileInput.click()">Browse</button>
-                  </div>
+            
+            <!-- Choice of adding students -->
+            <mat-step [stepControl]="newLabSessionForm.get('uploadMethod')!" [label]="'Adding Students'">                    
+              <h3>Select method of adding students:</h3>
+              <mat-radio-group formControlName="uploadMethod" style="display: flex; flex-direction: column;">
+                <mat-radio-button value="current" (click)="toggleUpload()">
+                  Add from current modules
+                </mat-radio-button>
+                <mat-radio-button value="upload" (click)="toggleUpload()">
+                  Upload student list excel file
+                </mat-radio-button>
+              </mat-radio-group>
 
-                  <!--<mat-error *ngIf="newModuleForm.get('modules')?.invalid && newModuleForm.get('modules')?.touched">
-                    Please upload at least one file.
-                  </mat-error>-->
-
-                  <div *ngIf="droppedFiles.length > 0">
-                    <h4>Dropped Files:</h4>
-                    <ul>
-                      <li *ngFor="let file of droppedFiles">{{ file.name }}</li>
-                    </ul>
-                  </div>
-  
+              <div *ngIf="newLabSessionForm.get('uploadMethod')?.value=='upload'">
                 <div>
-                  <button mat-button matStepperNext [disabled]="newLabSessionForm.get('studentList')!.invalid">Next</button>
+                  <h3>Please upload only one student list excel file:</h3>  
+                  <div
+                        class="dropzone"
+                        [class.dragover]="isDragOver"
+                        (dragover)="onDragOver($event)"
+                        (dragleave)="onDragLeave($event)"
+                        (drop)="onDropModule($event)"
+                      >
+                        <p>Drag and drop files here</p>
+                        <input type="file" multiple hidden (change)="uploadStudentFiles($event)" #fileInput/>
+                        <button type="button" (click)="fileInput.click()">Browse</button>
+                    </div>
+
+                    <!--<mat-error *ngIf="newModuleForm.get('modules')?.invalid && newModuleForm.get('modules')?.touched">
+                      Please upload at least one file.
+                    </mat-error>-->
+
+                    <div *ngIf="droppedFiles.length > 0">
+                      <h4>Dropped Files:</h4>
+                      <ul>
+                        <li *ngFor="let file of droppedFiles">{{ file.name }}</li>
+                      </ul>
+                    </div>
+                  </div>
+              </div>
+
+              <div *ngIf="newLabSessionForm.get('uploadMethod')?.value=='current'" style="margin-left: 5%;">
+                <h3>Select module and lab group(s):</h3>
+                  <h3>Module:</h3>   
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="courseName">
+                      <mat-option *ngFor="let course of semesterCourses" (click)="changeModule(course)" [value]="course">{{ course }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <h3>Lab Group:</h3>  
+                    <!--<mat-select formControlName="classGroups">
+                      <mat-option *ngFor="let classGroup of classGroups" [value]="classGroup">{{ classGroup.classGroupId.classGroupID }}</mat-option>
+                    </mat-select>-->
+                  <div class="checkbox-grid">
+                    <mat-checkbox *ngFor="let classGroup of classGroups" style="display: flex; flex-direction: column;" 
+                      (change)="onCheckboxChangeAddGroup($event, classGroup.classGroupId.classGroupID)">
+                        {{ classGroup.classGroupId.classGroupID }}
+                    </mat-checkbox>
+                  </div>
+              </div>
+        
+              <div>
+                <button mat-button matStepperNext (click)="checkUploadMethod()"
+                [disabled]="newLabSessionForm.get('studentList')!.invalid && newLabSessionForm.get('classGroups')!.invalid">Next</button>
+              </div>
+            
+            </mat-step>      
+
+            <!-- Assigning of lab based on upload method -->
+            <mat-step [label]="'Lab Details'" [stepControl]="newLabSessionForm.get('labDetailsMethod')!">
+              <div *ngIf="newLabSessionForm.get('uploadMethod')?.value == 'current'">
+                <h3>Please assign a lab and room to the class group(s) selected for {{ newLabSessionForm.get('courseName')?.value }}:</h3>
+                <div class="selectedClassGroupRows" *ngFor="let group of newLabSessionForm.get('classGroupNames')?.value">
+                  <div class="row-item">
+                    <h3>[{{ group }}]</h3>
+                  </div>
+                
+                  <div class="row-item">
+                    <h3>Lab:</h3>
+                    <mat-form-field appearance="fill">
+                      <mat-select [ngModel]="getLab(group)" (selectionChange)="currentLabChange($event, group)"
+                        [ngModelOptions]="{ standalone: true }">
+                        <mat-option *ngFor="let lab of displayLabNames" (click)="changeLab(lab)" [value]="lab">
+                          {{ lab }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                <!--[formControl]="(newLabSessionForm.get(group)?.value)[1]"-->
+                  <div class="row-item">
+                    <h3>Lab Room:</h3>
+                    <mat-form-field appearance="fill">
+                      <mat-select [ngModel]="getLabRoom(group)" (selectionChange)="currentLabRoomChange($event, group)"
+                        [ngModelOptions]="{ standalone: true }">
+                        <mat-option *ngFor="let room of displayLabRoomNumbers" [value]="room">
+                          {{ room }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
                 </div>
-              </mat-step>                                                   
+                
+
+              </div>
+
+              <div *ngIf="newLabSessionForm.get('uploadMethod')?.value == 'upload'">
+                <h3>Lab:</h3>  
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="labName">
+                    <mat-option *ngFor="let lab of displayLabNames" (click)="changeLab(lab)" [value]="lab">{{ lab }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <h3>Lab Room:</h3>  
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="labRoom">
+                    <mat-option *ngFor="let rooms of displayLabRoomNumbers" [value]="rooms" (click)="markUploadLabRoom()">{{ rooms }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div>
+                <button mat-button matStepperNext [disabled]="newLabSessionForm.get('labDetailsMethod')!.invalid">Next</button>
+              </div>
+            </mat-step>
 
             </form>
                           
@@ -110,7 +185,7 @@
               <p>Review the details before submitting.</p>
               <button mat-button matStepperPrevious>Back</button>
               <button mat-button (click)="newLabSessionForm.valid && submitDetails()" [disabled]="!newLabSessionForm.valid">
-                <span *ngIf="!submit">Create New Lab Session</span>
+                <span *ngIf="!submit">Create Ad Hoc Session</span>
                 <span *ngIf="submit">
                 Creating...</span>
               </button>              

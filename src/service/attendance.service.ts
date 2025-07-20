@@ -25,6 +25,10 @@ export interface MessageResponse {
       return this.http.get<any>(`${this.attendanceUrl}/getAttendanceByLabSessionId?labSessionId=${labSessionId}`);
     }
 
+    getAttendanceByStudentIdAndSemester(semesterID: string, studentID: string) : Observable<any> {
+      return this.http.get<any>(`${this.attendanceUrl}/getAttendanceByStudentIdAndSemester?semesterID=${semesterID}&studentID=${studentID}`);      
+    }
+
     markAttendance(attendancePaylaod: any) : Observable<MessageResponse> {
       return this.http.put<MessageResponse>(`${this.attendanceUrl}/markAttendance`, attendancePaylaod);
     }

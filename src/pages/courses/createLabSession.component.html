@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="createLabSession.component.scss">
     </head>
     <body>
-        <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"  *ngIf="courseId"><b>Create New Lab Session for {{courseId}}</b></h1>
+        <h1 mat-dialog-title style="margin-bottom: -20px; color: blueviolet;"  *ngIf="semester"><b>Create New Lab Session for {{semester}}</b></h1>
         <div mat-dialog-content style="width: 100%;">
           <mat-horizontal-stepper orientation="vertical" [linear]="true" #stepper style="width: 100%;">          
             <ng-template matStepperIcon="edit" let-index="index" style="width: 100px;">
